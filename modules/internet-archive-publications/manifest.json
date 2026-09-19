@@ -1,0 +1,51 @@
+{
+  "allowedHosts": [
+    "archive.org",
+    "*.archive.org",
+    "*.us.archive.org"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "authorizationURL": "https://archive.org/about/terms.php",
+    "website": "https://archive.org"
+  },
+  "baseURL": "https://archive.org",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "details",
+    "resources",
+    "discovery"
+  ],
+  "contentRating": "unknown",
+  "contentType": "publication",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/internet-archive-publications/index.js",
+    "sha256": "496cbbe174aef0cb33aa8a9970cdafde6e2de577fdc66b5c6cf6a4fb86a7147a"
+  },
+  "familyID": "internet-archive-publications",
+  "icon": {
+    "path": "modules/internet-archive-publications/icon.png",
+    "sha256": "8c5ddb7fba27a8d7b46a727f41e8c7bb14cbb6542a1bca8b35660c6caadff3a9"
+  },
+  "id": "internet-archive-publications",
+  "language": "multi",
+  "legacyIDs": [
+    "internetarchive-publications"
+  ],
+  "limits": {
+    "cacheTTLSeconds": 3600,
+    "maxConcurrentRequests": 3,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Internet Archive Publications",
+  "releaseTrack": "stable",
+  "status": "active",
+  "universalLink": "https://synthetiq.uk/manga/modules/internet-archive-publications",
+  "version": "1.0.0"
+}

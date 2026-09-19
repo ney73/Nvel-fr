@@ -1,0 +1,53 @@
+{
+  "allowedHosts": [
+    "*.archive.org",
+    "*.us.archive.org",
+    "archive.org"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "authorizationURL": "https://archive.org/about/terms.php",
+    "website": "https://archive.org"
+  },
+  "baseURL": "https://archive.org",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "discovery"
+  ],
+  "contentRating": "unknown",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/internet-archive/index.js",
+    "sha256": "09faf8cb97da482f404d0164ab28f619b5541ed0a2082e8f6efb442eb73b13be"
+  },
+  "familyID": "internet-archive",
+  "icon": {
+    "path": "modules/internet-archive/icon.png",
+    "sha256": "8c5ddb7fba27a8d7b46a727f41e8c7bb14cbb6542a1bca8b35660c6caadff3a9"
+  },
+  "id": "internet-archive",
+  "language": "multi",
+  "legacyIDs": [
+    "archive.org",
+    "internetarchive"
+  ],
+  "limits": {
+    "cacheTTLSeconds": 3600,
+    "maxConcurrentRequests": 3,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Internet Archive Scans",
+  "releaseTrack": "stable",
+  "status": "active",
+  "universalLink": "https://synthetiq.uk/manga/modules/internet-archive",
+  "version": "1.2.1"
+}

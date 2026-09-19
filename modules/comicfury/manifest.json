@@ -1,0 +1,52 @@
+{
+  "allowedHosts": [
+    "comicfury.com",
+    "*.comicfury.com",
+    "*.thecomicseries.com",
+    "*.webcomic.ws",
+    "img.comicfury.com"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "website": "https://comicfury.com"
+  },
+  "baseURL": "https://comicfury.com",
+  "capabilities": [
+    "popular",
+    "latest",
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "imageRequest",
+    "discovery"
+  ],
+  "contentRating": "safe",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/comicfury/index.js",
+    "sha256": "924aa0170bb69e5ed492849f177c0f51c4b4ef563d65c79c20786da8d7fa9ac6"
+  },
+  "familyID": "comicfury",
+  "icon": {
+    "path": "modules/comicfury/icon.png",
+    "sha256": "d496efa9ea92e4f0b66d4ea25bc6c3e8ff6f47bff681cd0a628744075e5f68ec"
+  },
+  "id": "comicfury",
+  "language": "en",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 900,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 16777216,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Comic Fury",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://synthetiq.uk/manga/modules/comicfury",
+  "version": "1.0.1"
+}
