@@ -342,6 +342,44 @@
     return { items, hasMore: Boolean(payload.hasMore) };
   }
 
+  const FEEDS = { latest: "Latest" };
+
+  async function listingPage(page = 1) {
+    const requestedPage = Number(page);
+    if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
+      throw new Error("NovelFrance discovery pagination page is invalid.");
+    }
+    const skip = (requestedPage - 1) * SEARCH_PAGE_SIZE;
+    if (!Number.isSafeInteger(skip)) throw new Error("NovelFrance discovery pagination is invalid.");
+    const payload = await requestJSON(`${API_URL}/novels?skip=${skip}&take=${SEARCH_PAGE_SIZE}`);
+    if (!payload || !Array.isArray(payload.novels)) throw new Error("NovelFrance discovery returned no novel list.");
+    if (!Number.isSafeInteger(payload.total) || payload.total < 0) {
+      throw new Error("NovelFrance discovery pagination metadata was invalid.");
+    }
+    const items = [];
+    const seen = new Set();
+    for (const novel of payload.novels) {
+      const item = safeSearchItem(novel);
+      if (!item || seen.has(item.id)) continue;
+      seen.add(item.id);
+      items.push(item);
+    }
+    return { items, hasMore: skip + SEARCH_PAGE_SIZE < payload.total };
+  }
+
+  async function discoveryHome() {
+    const latest = await listingPage(1);
+    return { sections: [{ id: "latest", title: FEEDS.latest, items: latest.items }] };
+  }
+
+  async function discoveryFeed(feedID, page = 1) {
+    const feed = String(feedID || "").trim().toLowerCase();
+    if (!Object.prototype.hasOwnProperty.call(FEEDS, feed)) {
+      throw new Error("NovelFrance discovery feed is unknown.");
+    }
+    return listingPage(page);
+  }
+
   async function extractDetails(id) {
     const slug = normalizeNovelSlug(id);
     if (detailsCache.has(slug)) return detailsCache.get(slug);
@@ -448,7 +486,7 @@
     return content;
   }
 
-  const handlers = { searchResults, extractDetails, extractChapters, extractText };
+  const handlers = { searchResults, extractDetails, extractChapters, extractText, discoveryHome, discoveryFeed };
   globalThis.SynthetiqModule = handlers;
   Object.assign(globalThis, handlers);
 })();

@@ -165,6 +165,50 @@ test("NovelFrance excludes premium chapters and rejects malformed chapter pagina
   await assert.rejects(() => badHasMoreModule.extractChapters("fixture-safe"), /pagination metadata was invalid/i);
 });
 
+test("NovelFrance discovery lists the latest feed with filtering and pagination", async () => {
+  const fixtures = {
+    page1: await fixture("discovery.json"),
+    page2: await fixture("discovery-page-2.json"),
+  };
+  const calls = [];
+  const module = await load(async (url) => {
+    calls.push(url);
+    const parsed = new URL(url);
+    assert.equal(parsed.hostname, "novelfrance.fr");
+    assert.equal(parsed.protocol, "https:");
+    assert.equal(parsed.pathname, "/api/novels");
+    if (parsed.searchParams.get("skip") === "20") return response(fixtures.page2);
+    return response(fixtures.page1);
+  });
+
+  const home = await module.discoveryHome();
+  assert.equal(home.sections.length, 1);
+  assert.equal(home.sections[0].id, "latest");
+  assert.deepEqual(JSON.parse(JSON.stringify(home.sections[0].items.map(({ id, title }) => ({ id, title })))), [
+    { id: "fixture-latest-a", title: "Fixture Latest A" },
+    { id: "fixture-latest-b", title: "Fixture Latest B" },
+  ]);
+  assert.match(calls[0], /skip=0/);
+
+  const feed = await module.discoveryFeed("latest", 1);
+  assert.equal(feed.items.length, 2);
+  assert.equal(feed.hasMore, true);
+  const feed2 = await module.discoveryFeed("latest", 2);
+  assert.deepEqual(JSON.parse(JSON.stringify(feed2.items.map(({ id }) => ({ id })))), [{ id: "fixture-latest-c" }]);
+  assert.equal(feed2.hasMore, true);
+  assert.match(calls[calls.length - 1], /skip=20/);
+
+  await assert.rejects(() => module.discoveryFeed("popular", 1), /feed is unknown/i);
+  await assert.rejects(() => module.discoveryFeed("latest", 0), /pagination page is invalid/i);
+});
+
+test("NovelFrance discovery rejects malformed listing metadata", async () => {
+  const malformed = await fixture("discovery-malformed.json");
+  const module = await load(async () => response(malformed));
+  await assert.rejects(() => module.discoveryHome(), /pagination metadata was invalid/i);
+  await assert.rejects(() => module.discoveryFeed("latest", 1), /pagination metadata was invalid/i);
+});
+
 test("NovelFrance manifest pins the entry and a valid neutral PNG icon", async () => {
   const manifest = JSON.parse(await readFile(path.join(root, "manifest.json"), "utf8"));
   const entry = await readFile(path.join(root, "index.js"));

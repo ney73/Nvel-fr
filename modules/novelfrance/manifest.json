@@ -9,17 +9,20 @@
   },
   "baseURL": "https://novelfrance.fr",
   "capabilities": [
+    "popular",
+    "latest",
     "search",
     "details",
     "chapters",
-    "text"
+    "text",
+    "discovery"
   ],
   "contentRating": "unknown",
   "contentType": "text",
   "contractVersion": 1,
   "entry": {
     "path": "modules/novelfrance/index.js",
-    "sha256": "9ca64a526da2cc17e72936d9779066257f04e50e0dad43c1c71588e7c0674d13"
+    "sha256": "c7078780d90ac5866bb247d49829646b38d1b74a722cc081682cb5e01922f1a3"
   },
   "familyID": "novelfrance",
   "icon": {
@@ -43,5 +46,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelfrance.fr",
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

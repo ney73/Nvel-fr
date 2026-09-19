@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-19T12:52:35.549Z",
+  "generatedAt": "2026-09-19T13:08:06.774Z",
   "mode": "fixtures",
   "query": "a",
   "itemLimit": 3,
@@ -8,7 +8,7 @@
   "failed": 0,
   "skipped": 0,
   "total": 1,
-  "totalDurationMs": 9,
+  "totalDurationMs": 8,
   "reports": [
     {
       "module": "black-clover",
@@ -159,11 +159,11 @@
         "extractDetails": 0,
         "extractChapters": 1,
         "terminal": 0,
-        "total": 7
+        "total": 6
       },
       "lifecycle": [],
       "error": null,
-      "durationMs": 7
+      "durationMs": 6
     }
   ]
 }
