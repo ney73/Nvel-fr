@@ -173,6 +173,29 @@ test("NovelDeLAube degrades failed feeds to empty lists instead of throwing", as
   assert.deepEqual(plain(await downModule.searchResults("dawn", 1)), { items: [], hasMore: false });
 });
 
+test("NovelDeLAube falls back to loose title/link pairing and the www host", async () => {
+  const loose = await fixture("catalogue-loose.html");
+  const looseModule = await load(async () => response(loose));
+  const looseFeed = await looseModule.discoveryFeed("catalogue", 1);
+  assert.deepStrictEqual(plain(looseFeed.items.map(({ id, title, image }) => ({ id, title, image }))), [
+    { id: "Fixture_Loose_A", title: "Fixture Loose A", image: "" },
+    { id: "Fixture_Loose_B", title: "Fixture Loose B", image: "" },
+  ]);
+
+  const catalogue = await fixture("catalogue.html");
+  const calls = [];
+  const retryModule = await load(async (url) => {
+    calls.push(url);
+    const parsed = new URL(url);
+    if (parsed.hostname === "noveldelaube.com") throw new Error("apex host unreachable");
+    if (parsed.pathname === "/notre_catalogue") return response(catalogue);
+    throw new Error(`Unexpected URL: ${url}`);
+  });
+  const retryFeed = await retryModule.discoveryFeed("catalogue", 1);
+  assert.equal(retryFeed.items.length, 2);
+  assert.ok(calls.some((url) => new URL(url).hostname === "www.noveldelaube.com"), "www retry expected");
+});
+
 test("NovelDeLAube falls back to the embedded novel list when cards are absent", async () => {
   const html = '<html><body><script type="application/ld+json">'
     + '{"@context":"https://schema.org","@type":"CollectionPage",'

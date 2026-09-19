@@ -181,36 +181,53 @@
     if (typeof globalThis.fetchv2 !== "function") throw new Error("NovelDeLAube requires the fetchv2 bridge.");
     const requestURL = absoluteURL(url);
     if (!requestURL) throw new Error("NovelDeLAube request URL is not public or host-confined.");
-    let lastError = null;
-    for (let attempt = 1; attempt <= 3; attempt += 1) {
-      if (attempt > 1) await sleep(700 * (attempt - 1));
-      try {
-        const response = await globalThis.fetchv2(
-          requestURL,
-          { ...DEFAULT_HEADERS },
-          "GET",
-          null,
-          { followRedirects: true, maxBytesHint: MAX_RESPONSE_BYTES, responseClass: "html" },
-        );
-        const status = Number(response && response.status);
-        if (!response || response.bodyDropped) throw new Error("NovelDeLAube response exceeded the module limit.");
-        const finalURL = response.finalUrl || response.url;
-        if (finalURL && !absoluteURL(finalURL)) {
-          throw new Error("NovelDeLAube redirected to a non-public or unapproved host.");
-        }
-        if (response.ok === false || (status && (status < 200 || status >= 300))) {
-          lastError = new Error(`NovelDeLAube request failed with HTTP ${status || "error"}.`);
-          if (!RETRYABLE_STATUS.has(status)) break;
-          continue;
-        }
-        const body = await responseBody(response);
-        if (!body) throw new Error("NovelDeLAube returned an empty response.");
-        if (isChallengePage(body)) throw new Error("NovelDeLAube returned a browser challenge.");
-        return body;
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-        if (/challenge|exceeded the module limit/i.test(lastError.message)) break;
+    // Some clients resolve or redirect the apex and www hosts differently.
+    // When the first host fails, retry the same path on the other host
+    // before giving up: one extra request, only on failure.
+    const candidates = [requestURL];
+    try {
+      const parsed = new URL(requestURL);
+      if (parsed.hostname === "noveldelaube.com") {
+        parsed.hostname = "www.noveldelaube.com";
+        const alternate = parsed.toString();
+        if (alternate !== requestURL) candidates.push(alternate);
       }
+    } catch (_) {
+      // Fall through with the single validated candidate.
+    }
+    let lastError = null;
+    for (const candidate of candidates) {
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        if (attempt > 1) await sleep(700 * (attempt - 1));
+        try {
+          const response = await globalThis.fetchv2(
+            candidate,
+            { ...DEFAULT_HEADERS },
+            "GET",
+            null,
+            { followRedirects: true, maxBytesHint: MAX_RESPONSE_BYTES, responseClass: "html" },
+          );
+          const status = Number(response && response.status);
+          if (!response || response.bodyDropped) throw new Error("NovelDeLAube response exceeded the module limit.");
+          const finalURL = response.finalUrl || response.url;
+          if (finalURL && !absoluteURL(finalURL)) {
+            throw new Error("NovelDeLAube redirected to a non-public or unapproved host.");
+          }
+          if (response.ok === false || (status && (status < 200 || status >= 300))) {
+            lastError = new Error(`NovelDeLAube request failed with HTTP ${status || "error"}.`);
+            if (!RETRYABLE_STATUS.has(status)) break;
+            continue;
+          }
+          const body = await responseBody(response);
+          if (!body) throw new Error("NovelDeLAube returned an empty response.");
+          if (isChallengePage(body)) throw new Error("NovelDeLAube returned a browser challenge.");
+          return body;
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error));
+          if (/challenge|exceeded the module limit/i.test(lastError.message)) break;
+        }
+      }
+      if (lastError && /challenge|exceeded the module limit/i.test(lastError.message)) break;
     }
     throw lastError || new Error("NovelDeLAube request failed.");
   }
@@ -284,6 +301,46 @@
     return items;
   }
 
+  function parseLooseList(html, pageURL) {
+    // Last-resort heuristic, documented as such: every catalogue card
+    // carries exactly one <h3> title followed by its "voirplus" link, so
+    // titles and links are zipped in document order. Items carry no cover
+    // here; a title without a cover still beats an empty Browse screen.
+    const titles = [];
+    const titlePattern = /<h3[^>]*>([\s\S]*?)<\/h3>/gi;
+    let titleMatch;
+    while ((titleMatch = titlePattern.exec(String(html || ""))) !== null) {
+      const title = cleanText(titleMatch[1]).replace(/^📕\s*/, "");
+      if (title) titles.push(title);
+    }
+    const hrefs = [];
+    const linkPattern = /<a[^>]*href="([^"]+)"[^>]*>\s*Voir plus[^<]*<\/a>/gi;
+    let linkMatch;
+    while ((linkMatch = linkPattern.exec(String(html || ""))) !== null) {
+      hrefs.push(decodeEntities(linkMatch[1]).trim());
+    }
+    const items = [];
+    const seen = new Set();
+    const count = Math.min(titles.length, hrefs.length);
+    for (let index = 0; index < count; index += 1) {
+      const href = absoluteURL(hrefs[index], pageURL);
+      if (!href) continue;
+      let slug = "";
+      try {
+        slug = normalizeNovelSlug(href);
+      } catch (_) {
+        continue;
+      }
+      if (seen.has(slug)) continue;
+      const entry = { slug, href, title: titles[index], image: "", genres: [] };
+      const item = safeCatalogueItem(entry);
+      if (!item) continue;
+      seen.add(slug);
+      items.push(item);
+    }
+    return items;
+  }
+
   function safeCatalogueItem(entry) {
     if (!entry || typeof entry !== "object") return null;
     try {
@@ -339,6 +396,8 @@
       const html = await requestHTML(pageURL);
       const cards = parseCards(html, pageURL);
       if (cards.length > 0) return { items: cards, hasMore: false };
+      const loose = parseLooseList(html, pageURL);
+      if (loose.length > 0) return { items: loose, hasMore: false };
       const listed = parseCatalogueList(html)
         .map((listedEntry) => safeCatalogueItem({ ...listedEntry, image: "", genres: [] }))
         .filter(Boolean);
