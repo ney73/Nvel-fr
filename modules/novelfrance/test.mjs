@@ -39,10 +39,12 @@ test("NovelFrance filters unsafe search results and paginates with bounded publi
   });
 
   const result = await module.searchResults("fixture", 1);
-  assert.equal(result.items.length, 1);
-  assert.equal(result.items[0].id, "fixture-safe");
+  assert.deepEqual(JSON.parse(JSON.stringify(result.items.map(({ id }) => ({ id })))), [
+    { id: "fixture-safe" },
+    { id: "fixture-grown" },
+  ]);
   assert.equal(result.items[0].image, "https://novelfrance.fr/uploads/covers/fixture-safe.webp");
-  assert.equal((await module.searchResults("fixture", 2)).items.length, 1);
+  assert.equal((await module.searchResults("fixture", 2)).items.length, 2);
   assert.match(calls[1], /skip=20/);
   assert.match(calls[1], /take=20/);
 });
@@ -187,11 +189,12 @@ test("NovelFrance discovery lists the latest feed with filtering and pagination"
   assert.deepEqual(JSON.parse(JSON.stringify(home.sections[0].items.map(({ id, title }) => ({ id, title })))), [
     { id: "fixture-latest-a", title: "Fixture Latest A" },
     { id: "fixture-latest-b", title: "Fixture Latest B" },
+    { id: "fixture-latest-grown", title: "Fixture Latest Grown" },
   ]);
   assert.match(calls[0], /skip=0/);
 
   const feed = await module.discoveryFeed("latest", 1);
-  assert.equal(feed.items.length, 2);
+  assert.equal(feed.items.length, 3);
   assert.equal(feed.hasMore, true);
   const feed2 = await module.discoveryFeed("latest", 2);
   assert.deepEqual(JSON.parse(JSON.stringify(feed2.items.map(({ id }) => ({ id })))), [{ id: "fixture-latest-c" }]);

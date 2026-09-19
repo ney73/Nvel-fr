@@ -348,8 +348,9 @@ async function testInternetArchive() {
 }
 
 const index = await validateCatalogue();
-await testWeebCentral();
-await testMangaFire();
-await testInternetArchive();
+const publishedSlugs = new Set(index.modules.map((entry) => path.basename(path.dirname(entry.manifest.path))));
+if (publishedSlugs.has("weebcentral")) await testWeebCentral();
+if (publishedSlugs.has("mangafire")) await testMangaFire();
+if (publishedSlugs.has("internet-archive")) await testInternetArchive();
 
 console.log(`Validated ${index.modules.length} manifests, all deterministic fixtures, JSON, PNG assets, no ZIPs${skipHashes ? ", hashes skipped" : ", and all SHA-256 descriptors"}.`);

@@ -15,31 +15,30 @@
     "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
     Referer: `${BASE_URL}/`,
   };
+  // Explicit sexual-content markers only. Broad audience-maturity and
+  // romance-subgenre tags (mature, adulte, harem, ecchi, yaoi, yuri) are
+  // deliberately NOT blocked: observed site usage tags mainstream,
+  // non-explicit fiction with them (e.g. dark fantasy tagged "Mature",
+  // action/romance tagged "Harem"). The module stays rated "unknown",
+  // never "safe".
   const UNSAFE_MARKERS = [
     "18",
     "r 18",
-    "adult",
-    "adulte",
-    "mature",
-    "ecchi",
-    "harem",
-    "yaoi",
-    "yuri",
+    "x rated",
+    "nsfw",
     "hentai",
+    "porn",
+    "pornographique",
+    "smut",
+    "explicit",
     "erotic",
     "erotique",
     "erotisme",
-    "smut",
-    "nsfw",
-    "explicit",
-    "porn",
-    "pornographique",
     "sexuel",
     "sexuelle",
     "sexual",
     "lemon",
     "lime",
-    "x rated",
   ];
   const detailsCache = new Map();
   const chaptersCache = new Map();

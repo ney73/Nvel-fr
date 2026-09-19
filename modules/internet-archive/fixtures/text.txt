@@ -1,3 +1,0 @@
-Fixture full text.
-
-This text is deterministic and contains no third-party work.

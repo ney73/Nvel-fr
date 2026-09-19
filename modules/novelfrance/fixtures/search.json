@@ -19,7 +19,7 @@
       "coverImage": "/uploads/covers/fixture-unsafe.webp",
       "author": "Fixture Author",
       "status": "ONGOING",
-      "genres": [{ "name": "Mature", "slug": "mature" }],
+      "genres": [{ "name": "Smut", "slug": "smut" }],
       "tags": []
     },
     {
@@ -30,8 +30,19 @@
       "coverImage": "/uploads/covers/fixture-missing.webp",
       "author": "Fixture Author",
       "status": "ONGOING"
+    },
+    {
+      "id": "fixture-grown-id",
+      "title": "Fixture Grown Novel",
+      "slug": "fixture-grown",
+      "description": "A mainstream novel tagged for a mature audience.",
+      "coverImage": "/uploads/covers/fixture-grown.webp",
+      "author": "Fixture Author",
+      "status": "ONGOING",
+      "genres": [{ "name": "Mature", "slug": "mature" }],
+      "tags": [{ "name": "Harem", "slug": "harem" }]
     }
   ],
-  "total": 3,
+  "total": 4,
   "hasMore": false
 }
