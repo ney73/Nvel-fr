@@ -1,0 +1,48 @@
+{
+  "allowedHosts": [
+    "noveldelaube.com",
+    "*.noveldelaube.com"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "website": "https://noveldelaube.com"
+  },
+  "baseURL": "https://noveldelaube.com",
+  "capabilities": [
+    "catalogue",
+    "originals",
+    "search",
+    "details",
+    "chapters",
+    "text",
+    "discovery"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "text",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/noveldelaube/index.js",
+    "sha256": "d9e2f931abbfbedced3ca51524d44608302d09b1264d6aeafd60abdcd9fdcb7e"
+  },
+  "familyID": "noveldelaube-v1",
+  "icon": {
+    "path": "modules/noveldelaube/icon.png",
+    "sha256": "7e327d1dfc62b2caa1b950a9efe245841e810264d39c51b5ba209edc87b7e427"
+  },
+  "id": "noveldelaube-v1",
+  "language": "fr",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 900,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 8388608,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Novel de l'aube",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://noveldelaube.com",
+  "version": "0.1.0"
+}

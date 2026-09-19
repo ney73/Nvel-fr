@@ -3,6 +3,9 @@
   "modules": {
     "ney73.nvl-fr": {
       "chapterScope": "api"
+    },
+    "noveldelaube-v1": {
+      "chapterScope": "selected-series-dom"
     }
   }
 }

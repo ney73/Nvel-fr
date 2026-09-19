@@ -20,6 +20,25 @@
         "path": "modules/novelfrance/icon.png",
         "sha256": "7430c04b3aaa06a57cab6d1fab557638161f5396c27beaa3331c4029ff149e06"
       }
+    },
+    {
+      "id": "noveldelaube-v1",
+      "familyID": "noveldelaube-v1",
+      "name": "Novel de l'aube",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "text",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/noveldelaube/manifest.json",
+        "sha256": "f21d5cf789e5bf96a63f1b7c92ffe22c5a6d55180755f7cfbb34e4f9fe41b7c5"
+      },
+      "icon": {
+        "path": "modules/noveldelaube/icon.png",
+        "sha256": "7e327d1dfc62b2caa1b950a9efe245841e810264d39c51b5ba209edc87b7e427"
+      }
     }
   ],
   "repository": {
