@@ -302,12 +302,14 @@
       if ([...genres, title].some(hasUnsafeMarker)) return null;
       const author = cleanText(entry.author);
       const rawStatus = cleanText(entry.status);
+      const image = absoluteURL(entry.image) || "";
       const item = {
         id: slug,
         href,
         url: href,
         title,
-        image: absoluteURL(entry.image) || "",
+        image,
+        cover: image,
         author,
         authors: author ? [author] : [],
         genres,
@@ -463,6 +465,7 @@
       title,
       description,
       image,
+      cover: image,
       author,
       authors: author ? [author] : [],
       genres: [...new Set(genres)],
