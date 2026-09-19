@@ -684,10 +684,10 @@
       }
     },
     {
-      "id": "novelfrance",
+      "id": "ney73.nvl-fr",
       "familyID": "novelfrance",
       "name": "NovelFrance",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "language": "fr",
       "contentType": "text",
       "contentRating": "unknown",
@@ -696,7 +696,7 @@
       "sortPriority": 98,
       "manifest": {
         "path": "modules/novelfrance/manifest.json",
-        "sha256": "d4e8e03682b713c5d8a3b3be88c19e05172f79ec20797afb76a1fa4c72290beb"
+        "sha256": "46e925a4037b19b43a1299193e93e62f30683b5d080a19e39f08e05a9bdf697b"
       },
       "icon": {
         "path": "modules/novelfrance/icon.png",

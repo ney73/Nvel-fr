@@ -26,9 +26,11 @@
     "path": "modules/novelfrance/icon.png",
     "sha256": "7430c04b3aaa06a57cab6d1fab557638161f5396c27beaa3331c4029ff149e06"
   },
-  "id": "novelfrance",
+  "id": "ney73.nvl-fr",
   "language": "fr",
-  "legacyIDs": [],
+  "legacyIDs": [
+    "novelfrance"
+  ],
   "limits": {
     "cacheTTLSeconds": 900,
     "maxConcurrentRequests": 2,
@@ -41,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelfrance.fr",
-  "version": "0.1.1"
+  "version": "0.2.0"
 }

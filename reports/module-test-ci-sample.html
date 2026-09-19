@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Synthetiq Module Probe Report (app-shaped, Node vm)</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b0d12; --card:#151a22; --text:#e8eef7; --muted:#9aa7b8; --pass:#3dd68c; --fail:#ff6b6b; --skip:#6b7280; --accent:#6ea8fe; }
+  body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background:var(--bg); color:var(--text); }
+  header { padding:28px 32px; border-bottom:1px solid #243041; background:linear-gradient(180deg,#121826,#0b0d12); }
+  h1 { margin:0 0 8px; font-size:28px; }
+  .meta { color:var(--muted); font-size:14px; }
+  .stats { display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; }
+  .stat { background:var(--card); border:1px solid #243041; border-radius:12px; padding:12px 16px; min-width:120px; }
+  .stat strong { display:block; font-size:22px; }
+  main { padding:24px 32px 48px; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; }
+  th, td { padding:10px 12px; border-bottom:1px solid #243041; text-align:left; font-size:13px; vertical-align:top; }
+  th { background:#1b2330; color:var(--muted); font-weight:600; }
+  .pass { color:var(--pass); font-weight:700; }
+  .fail { color:var(--fail); font-weight:700; }
+  .skip { color:var(--skip); }
+  .error { color:#f5a97f; max-width:280px; word-break:break-word; }
+  code { font-size:12px; color:var(--accent); }
+  h2 { margin-top:32px; }
+  .timing-row { display:grid; grid-template-columns:160px 1fr 80px; gap:10px; align-items:center; margin:8px 0; }
+  .bar { display:flex; height:22px; background:#1b2330; border-radius:6px; overflow:hidden; }
+  .bar-seg { background:linear-gradient(90deg,#3b82f6,#22c55e); color:#041018; font-size:10px; display:flex; align-items:center; justify-content:center; overflow:hidden; white-space:nowrap; }
+  .timing-ms { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .lifecycle { background:var(--card); border:1px solid #243041; border-radius:12px; padding:16px; margin-top:12px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Synthetiq Module Probe Report</h1>
+  <div class="meta">App-shaped Node vm probe — not a full iOS install/WebKit/library harness.</div>
+  <div class="meta">Mode: <strong>fixtures</strong> · Generated: 2026-09-19T12:46:35.410Z · Query: a · Item limit: 3</div>
+  <div class="stats">
+    <div class="stat"><strong class="pass">1</strong>Passed</div>
+    <div class="stat"><strong class="fail">0</strong>Failed</div>
+    <div class="stat"><strong>1</strong>Total</div>
+    <div class="stat"><strong>8ms</strong>Wall time</div>
+  </div>
+</header>
+<main>
+  <h2>Modules</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Module</th><th>Ver</th><th>Type</th><th>Track</th><th>Result</th><th>Total</th>
+        <th>Load</th><th>Home</th><th>Search</th><th>Details</th><th>Chapters</th><th>Images</th><th>Text</th><th>Resources</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="pass-row">
+        <td><strong>Black Clover Online</strong><br><code>black-clover</code></td>
+        <td>1.0.2</td>
+        <td>pageImages</td>
+        <td>beta</td>
+        <td class="pass">PASS</td>
+        <td>6ms</td>
+        <td class="pass">OK 3ms</td><td class="pass">OK 1ms</td><td class="pass">OK 0ms</td><td class="pass">OK 0ms</td><td class="pass">OK 1ms</td><td class="pass">OK 0ms</td><td class="skip">—</td><td class="skip">—</td>
+        <td class="error"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Stage timings</h2>
+  <div class="timing-row"><div class="timing-label">black-clover</div><div class="bar"><div class="bar-seg" style="width:50%" title="load: 3ms">load</div><div class="bar-seg" style="width:17%" title="discoveryHome: 1ms">discoveryHome</div><div class="bar-seg" style="width:2%" title="searchResults: 0ms">searchResults</div><div class="bar-seg" style="width:2%" title="extractDetails: 0ms">extractDetails</div><div class="bar-seg" style="width:17%" title="extractChapters: 1ms">extractChapters</div><div class="bar-seg" style="width:2%" title="terminal: 0ms">terminal</div></div><div class="timing-ms">6ms</div></div>
+
+  <h2>Lifecycle notes</h2>
+  <div class="lifecycle">
+    <div><strong>black-clover</strong>: No reportProgress lifecycle events during this run.</div>
+  </div>
+
+  <h2>How to re-run</h2>
+  <div class="lifecycle">
+    <code>npm run test:module:report</code> · fixtures: <code>npm run test:module:report:fixtures</code> · subset: <code>npm run test:module -- comicfury --report</code>
+  </div>
+</main>
+</body>
+</html>
