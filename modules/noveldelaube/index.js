@@ -4,7 +4,7 @@
   const BASE_URL = "https://noveldelaube.com";
   const CATALOGUE_PATH = "/notre_catalogue";
   const ORIGINALS_PATH = "/creations_originales";
-  const MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
+  const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
   const MAX_TEXT_BYTES = 1024 * 1024;
   const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
   const SLUG_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.~-]{0,120}$/;
@@ -347,9 +347,16 @@
     }
   }
 
+  async function safeFeed(feed, page) {
+    try {
+      return await feedPage(feed, page);
+    } catch (_) {
+      return { items: [], hasMore: false };
+    }
+  }
+
   async function discoveryHome() {
-    const catalogue = await feedPage("catalogue", 1);
-    const originals = await feedPage("originals", 1);
+    const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
     return {
       sections: [
         { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
@@ -374,8 +381,7 @@
     // client-side with an accent-insensitive substring match.
     const folded = fold(text);
     if (!folded) return { items: [], hasMore: false };
-    const catalogue = await feedPage("catalogue", 1);
-    const originals = await feedPage("originals", 1);
+    const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
     const seen = new Set();
     const items = [];
     for (const item of [...catalogue.items, ...originals.items]) {

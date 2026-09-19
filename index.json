@@ -25,7 +25,7 @@
       "id": "noveldelaube-v1",
       "familyID": "noveldelaube-v1",
       "name": "Novel de l'aube",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "language": "fr",
       "contentType": "text",
       "contentRating": "suggestive",
@@ -33,7 +33,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/noveldelaube/manifest.json",
-        "sha256": "a15dccd10da847c21f9e64715a968d5673523b1a5358fafab581f52d14d9b4e9"
+        "sha256": "eebaa55cee0bce9a5977ceeb4c5e0e6c28697b342554b8e511ee704fd46a23bc"
       },
       "icon": {
         "path": "modules/noveldelaube/icon.png",

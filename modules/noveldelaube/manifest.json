@@ -20,7 +20,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/noveldelaube/index.js",
-    "sha256": "ba282d8e7a6817ec490aa9ae94e0b106d618724963225be0ac309711cd51bbb7"
+    "sha256": "8568bb75e18ad037cb5e753de3639e23b04283d0d6585312b8867eefe5cc901f"
   },
   "familyID": "noveldelaube-v1",
   "icon": {
@@ -33,7 +33,7 @@
   "limits": {
     "cacheTTLSeconds": 900,
     "maxConcurrentRequests": 2,
-    "maxResponseBytes": 8388608,
+    "maxResponseBytes": 4194304,
     "maxScriptBytes": 524288,
     "timeoutMilliseconds": 30000
   },
@@ -42,5 +42,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://noveldelaube.com",
-  "version": "0.1.6"
+  "version": "0.1.7"
 }
