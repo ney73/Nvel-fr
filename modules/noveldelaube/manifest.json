@@ -1,6 +1,7 @@
 {
   "allowedHosts": [
     "noveldelaube.com",
+    "www.noveldelaube.com",
     "*.noveldelaube.com"
   ],
   "attribution": {
@@ -20,7 +21,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/noveldelaube/index.js",
-    "sha256": "8568bb75e18ad037cb5e753de3639e23b04283d0d6585312b8867eefe5cc901f"
+    "sha256": "6e4f95bf7a12781954df02f3dc23af3c36df3b982dc84135b001859c319f9834"
   },
   "familyID": "noveldelaube-v1",
   "icon": {
@@ -42,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://noveldelaube.com",
-  "version": "0.1.7"
+  "version": "0.1.8"
 }

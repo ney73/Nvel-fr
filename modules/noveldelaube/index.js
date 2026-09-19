@@ -321,10 +321,9 @@
   }
 
   async function feedPage(feed, page = 1) {
-    const requestedPage = Number(page);
-    if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
-      throw new Error("NovelDeLAube discovery pagination page is invalid.");
-    }
+    // Page numbers are coerced, never rejected: some clients paginate from
+    // zero and a crash here would take down the whole Discover screen.
+    const requestedPage = Math.max(1, Number(page) || 1);
     if (!Object.prototype.hasOwnProperty.call(FEEDS, feed)) {
       throw new Error("NovelDeLAube discovery feed is unknown.");
     }
@@ -356,40 +355,49 @@
   }
 
   async function discoveryHome() {
-    const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
-    return {
-      sections: [
-        { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
-        { id: "originals", title: FEEDS.originals, items: originals.items },
-      ],
-    };
+    try {
+      const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
+      return {
+        sections: [
+          { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
+          { id: "originals", title: FEEDS.originals, items: originals.items },
+        ],
+      };
+    } catch (_) {
+      return { sections: [] };
+    }
   }
 
   async function discoveryFeed(feedID, page = 1) {
     const feed = String(feedID || "").trim().toLowerCase();
-    return feedPage(feed, page);
+    try {
+      return await feedPage(feed, page);
+    } catch (_) {
+      return { items: [], hasMore: false };
+    }
   }
 
   async function searchResults(query, page = 1) {
     const text = String(query || "").trim();
-    const requestedPage = Number(page);
-    if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
-      throw new Error("NovelDeLAube search pagination page is invalid.");
-    }
+    const requestedPage = Math.max(1, Number(page) || 1);
     if (!text || requestedPage !== 1) return { items: [], hasMore: false };
     // The site exposes no search endpoint: filter the full catalogue
     // client-side with an accent-insensitive substring match.
     const folded = fold(text);
     if (!folded) return { items: [], hasMore: false };
-    const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
-    const seen = new Set();
-    const items = [];
-    for (const item of [...catalogue.items, ...originals.items]) {
-      if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
-      seen.add(item.id);
-      items.push(item);
+    try {
+      const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
+      const seen = new Set();
+      const items = [];
+      for (const item of [...catalogue.items, ...originals.items]) {
+        if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
+        seen.add(item.id);
+        items.push(item);
+      }
+      return { items, hasMore: false };
+    } catch (_) {
+      return { items: [], hasMore: false };
     }
-    return { items, hasMore: false };
   }
 
   function fieldValue(html, label) {

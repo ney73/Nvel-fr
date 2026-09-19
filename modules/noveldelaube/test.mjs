@@ -103,9 +103,20 @@ test("NovelDeLAube rejects unsafe, empty, challenge and invalid inputs", async (
     () => module.extractText("https://noveldelaube.com/notre_catalogue/Fixture_Dawn_A/tome_1/chapitre-vide"),
     /unavailable/i,
   );
-  await assert.rejects(() => module.discoveryFeed("unknown", 1), /feed is unknown/i);
-  await assert.rejects(() => module.discoveryFeed("catalogue", 0), /pagination page is invalid/i);
-  await assert.rejects(() => module.searchResults("dawn", 0), /pagination page is invalid/i);
+  await assert.rejects(() => module.extractDetails("https://evil.example/novel/x"), /host|identifier/i);
+  await assert.rejects(() => module.extractText("not a url \\"), /identifier|host/i);
+  assert.deepStrictEqual(
+    plain(await module.discoveryFeed("unknown", 1)),
+    { items: [], hasMore: false },
+  );
+  assert.deepStrictEqual(
+    plain(await module.discoveryFeed("catalogue", 0)),
+    plain(await module.discoveryFeed("catalogue", 1)),
+  );
+  assert.deepStrictEqual(
+    plain(await module.searchResults("dawn", 0)),
+    plain(await module.searchResults("dawn", 1)),
+  );
   assert.deepStrictEqual(plain(await module.searchResults("", 1)), { items: [], hasMore: false });
   assert.deepStrictEqual(plain(await module.searchResults("dawn", 2)), { items: [], hasMore: false });
   assert.deepStrictEqual(plain(await module.discoveryFeed("catalogue", 3)), { items: [], hasMore: false });
