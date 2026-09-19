@@ -106,6 +106,48 @@ test("NovelDeLAube rejects unsafe, empty, challenge and invalid inputs", async (
   await assert.rejects(() => module.extractText("not a url \\"), /identifier|host/i);
 });
 
+test("NovelDeLAube uses only bridge-safe request headers", async () => {
+  const seen = [];
+  const module = await load(async (url, headers, method) => {
+    seen.push({ headers, method });
+    const parsed = new URL(url);
+    if (parsed.pathname === "/notre_catalogue") return response(await fixture("catalogue.html"));
+    if (parsed.pathname === "/creations_originales") return response(await fixture("originals.html"));
+    throw new Error(`Unexpected URL: ${url}`);
+  });
+  await module.discoveryHome();
+  assert.ok(seen.length > 0);
+  for (const call of seen) {
+    assert.equal(call.method, "GET");
+    assert.ok(!("User-Agent" in call.headers), "User-Agent must not be set on fetchv2");
+    assert.ok(!("Host" in call.headers), "Host must not be set on fetchv2");
+  }
+});
+
+test("NovelDeLAube serves the surviving feed when one catalogue page fails", async () => {
+  const catalogue = await fixture("catalogue.html");
+  const module = await load(async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/notre_catalogue") return response(catalogue);
+    throw new Error("NovelDeLAube originals page failed with HTTP 500.");
+  });
+
+  const home = await module.discoveryHome();
+  assert.deepEqual(plain(home.sections.map(({ id }) => ({ id }))), [{ id: "catalogue" }]);
+  assert.equal(home.sections[0].items.length, 2);
+  const search = await module.searchResults("dawn", 1);
+  assert.deepEqual(plain(search.items.map(({ id }) => ({ id }))), [
+    { id: "Fixture_Dawn_A" },
+    { id: "Fixture_Dawn_B" },
+  ]);
+
+  const downModule = await load(async () => {
+    throw new Error("NovelDeLAube catalogue page failed with HTTP 500.");
+  });
+  await assert.rejects(() => downModule.discoveryHome(), /HTTP 500/);
+  await assert.rejects(() => downModule.searchResults("dawn", 1), /HTTP 500/);
+});
+
 test("NovelDeLAube rejects browser challenges and empty responses", async () => {
   const challenge = await fixture("challenge.html");
   const module = await load(async () => response(challenge));

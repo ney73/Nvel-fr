@@ -13,7 +13,6 @@
     Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
     Referer: `${BASE_URL}/`,
-    "User-Agent": "Mozilla/5.0",
   };
   // Explicit sexual-content markers only (same doctrine as the NovelFrance
   // module): broad maturity/romance-subgenre tags are not blocked, the
@@ -279,13 +278,20 @@
   }
 
   async function discoveryHome() {
-    const [catalogue, originals] = await Promise.all([feedPage("catalogue", 1), feedPage("originals", 1)]);
-    return {
-      sections: [
-        { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
-        { id: "originals", title: FEEDS.originals, items: originals.items },
-      ],
-    };
+    // One feed must never take down the other: a section is included only
+    // when its page loads, and Discover fails solely when every feed fails.
+    const [catalogue, originals] = await Promise.allSettled([feedPage("catalogue", 1), feedPage("originals", 1)]);
+    const sections = [];
+    if (catalogue.status === "fulfilled") {
+      sections.push({ id: "catalogue", title: FEEDS.catalogue, items: catalogue.value.items });
+    }
+    if (originals.status === "fulfilled") {
+      sections.push({ id: "originals", title: FEEDS.originals, items: originals.value.items });
+    }
+    if (sections.length === 0) {
+      throw catalogue.reason instanceof Error ? catalogue.reason : new Error("NovelDeLAube discovery failed.");
+    }
+    return { sections };
   }
 
   async function discoveryFeed(feedID, page = 1) {
@@ -301,16 +307,25 @@
     }
     if (!text || requestedPage !== 1) return { items: [], hasMore: false };
     // The site exposes no search endpoint: filter the full catalogue
-    // client-side with an accent-insensitive substring match.
+    // client-side with an accent-insensitive substring match. A failing
+    // feed page is skipped; search fails solely when every feed fails.
     const folded = fold(text);
     if (!folded) return { items: [], hasMore: false };
-    const [catalogue, originals] = await Promise.all([feedPage("catalogue", 1), feedPage("originals", 1)]);
+    const [catalogue, originals] = await Promise.allSettled([feedPage("catalogue", 1), feedPage("originals", 1)]);
+    const pages = [catalogue, originals]
+      .filter((result) => result.status === "fulfilled")
+      .map((result) => result.value);
+    if (pages.length === 0) {
+      throw catalogue.reason instanceof Error ? catalogue.reason : new Error("NovelDeLAube search failed.");
+    }
     const seen = new Set();
     const items = [];
-    for (const item of [...catalogue.items, ...originals.items]) {
-      if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
-      seen.add(item.id);
-      items.push(item);
+    for (const page of pages) {
+      for (const item of page.items) {
+        if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
+        seen.add(item.id);
+        items.push(item);
+      }
     }
     return { items, hasMore: false };
   }
