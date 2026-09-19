@@ -22,7 +22,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/novelfrance/index.js",
-    "sha256": "8ffd598c2c8483b9c076b96b74790ce79fd276c54ac3b13c598fc00b44324819"
+    "sha256": "bfa2a5496d4d8555de5c3e863e53ef56d008f771f9cd81d7f7b08912a4456fad"
   },
   "familyID": "novelfrance",
   "icon": {
@@ -46,5 +46,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelfrance.fr",
-  "version": "0.4.0"
+  "version": "0.4.1"
 }

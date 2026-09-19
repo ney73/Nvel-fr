@@ -167,8 +167,9 @@ test("NovelFrance excludes premium chapters and rejects malformed chapter pagina
   await assert.rejects(() => badHasMoreModule.extractChapters("fixture-safe"), /pagination metadata was invalid/i);
 });
 
-test("NovelFrance discovery lists the latest feed with filtering and pagination", async () => {
+test("NovelFrance discovery lists popular and latest feeds with filtering and pagination", async () => {
   const fixtures = {
+    popular: await fixture("discovery-popular.json"),
     page1: await fixture("discovery.json"),
     page2: await fixture("discovery-page-2.json"),
   };
@@ -179,14 +180,20 @@ test("NovelFrance discovery lists the latest feed with filtering and pagination"
     assert.equal(parsed.hostname, "novelfrance.fr");
     assert.equal(parsed.protocol, "https:");
     assert.equal(parsed.pathname, "/api/novels");
+    if (parsed.searchParams.get("sort") === "views") return response(fixtures.popular);
     if (parsed.searchParams.get("skip") === "20") return response(fixtures.page2);
     return response(fixtures.page1);
   });
 
   const home = await module.discoveryHome();
-  assert.equal(home.sections.length, 1);
-  assert.equal(home.sections[0].id, "latest");
-  assert.deepEqual(JSON.parse(JSON.stringify(home.sections[0].items.map(({ id, title }) => ({ id, title })))), [
+  assert.equal(home.sections.length, 2);
+  assert.equal(home.sections[0].id, "popular");
+  assert.deepEqual(JSON.parse(JSON.stringify(home.sections[0].items.map(({ id }) => ({ id })))), [
+    { id: "fixture-pop-a" },
+    { id: "fixture-pop-b" },
+  ]);
+  assert.equal(home.sections[1].id, "latest");
+  assert.deepEqual(JSON.parse(JSON.stringify(home.sections[1].items.map(({ id, title }) => ({ id, title })))), [
     { id: "fixture-latest-a", title: "Fixture Latest A" },
     { id: "fixture-latest-b", title: "Fixture Latest B" },
     { id: "fixture-latest-grown", title: "Fixture Latest Grown" },
@@ -201,7 +208,14 @@ test("NovelFrance discovery lists the latest feed with filtering and pagination"
   assert.equal(feed2.hasMore, true);
   assert.match(calls[calls.length - 1], /skip=20/);
 
-  await assert.rejects(() => module.discoveryFeed("popular", 1), /feed is unknown/i);
+  const popFeed = await module.discoveryFeed("popular", 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(popFeed.items.map(({ id }) => ({ id })))), [
+    { id: "fixture-pop-a" },
+    { id: "fixture-pop-b" },
+  ]);
+  assert.equal(popFeed.hasMore, true);
+
+  await assert.rejects(() => module.discoveryFeed("trending", 1), /feed is unknown/i);
   await assert.rejects(() => module.discoveryFeed("latest", 0), /pagination page is invalid/i);
 });
 
@@ -210,6 +224,36 @@ test("NovelFrance discovery rejects malformed listing metadata", async () => {
   const module = await load(async () => response(malformed));
   await assert.rejects(() => module.discoveryHome(), /pagination metadata was invalid/i);
   await assert.rejects(() => module.discoveryFeed("latest", 1), /pagination metadata was invalid/i);
+});
+
+test("NovelFrance search retries an empty multi-word query word by word with strict AND", async () => {
+  const fixtures = {
+    empty: await fixture("search-empty.json"),
+    target: await fixture("search-word-target.json"),
+    mysteries: await fixture("search-word-mysteries.json"),
+  };
+  const calls = [];
+  const module = await load(async (url) => {
+    calls.push(url);
+    const parsed = new URL(url);
+    assert.equal(parsed.hostname, "novelfrance.fr");
+    assert.equal(parsed.pathname, "/api/search");
+    const query = parsed.searchParams.get("q");
+    if (query === "target") return response(fixtures.target);
+    if (query === "mysteries") return response(fixtures.mysteries);
+    return response(fixtures.empty);
+  });
+
+  const result = await module.searchResults("target mysteries", 1);
+  assert.deepEqual(JSON.parse(JSON.stringify(result.items.map(({ id, title }) => ({ id, title })))), [
+    { id: "fixture-phrase-target", title: "Fixture Phrase Target" },
+  ]);
+  assert.equal(result.hasMore, false);
+  assert.ok(calls.length >= 3, "expected a direct query plus one request per word");
+
+  const single = await module.searchResults("target", 1);
+  assert.equal(single.items.length, 2);
+  assert.equal(single.hasMore, false);
 });
 
 test("NovelFrance manifest pins the entry and a valid neutral PNG icon", async () => {

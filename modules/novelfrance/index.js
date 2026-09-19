@@ -303,15 +303,19 @@
     }
   }
 
-  async function searchResults(query, page = 1) {
-    const text = String(query || "").trim();
-    if (!text) return { items: [], hasMore: false };
-    const requestedPage = Number(page);
-    if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
-      throw new Error("NovelFrance search pagination page is invalid.");
+  function collectSearchItems(novels) {
+    const items = [];
+    const seen = new Set();
+    for (const novel of novels || []) {
+      const item = safeSearchItem(novel);
+      if (!item || seen.has(item.id)) continue;
+      seen.add(item.id);
+      items.push(item);
     }
-    const skip = (requestedPage - 1) * SEARCH_PAGE_SIZE;
-    if (!Number.isSafeInteger(skip)) throw new Error("NovelFrance search pagination is invalid.");
+    return items;
+  }
+
+  async function requestSearch(text, skip) {
     const payload = await requestJSON(`${API_URL}/search?q=${encodeURIComponent(text.slice(0, 160))}&skip=${skip}&take=${SEARCH_PAGE_SIZE}`);
     if (!payload || !Array.isArray(payload.novels)) throw new Error("NovelFrance search returned no novel list.");
     if (typeof payload.hasMore !== "boolean") throw new Error("NovelFrance search pagination metadata was invalid.");
@@ -330,27 +334,78 @@
       const expectedHasMore = payload.skip + payload.take < payload.total;
       if (payload.hasMore !== expectedHasMore) throw new Error("NovelFrance search pagination metadata was inconsistent.");
     }
-    const items = [];
-    const seen = new Set();
-    for (const novel of payload.novels) {
-      const item = safeSearchItem(novel);
-      if (!item || seen.has(item.id)) continue;
-      seen.add(item.id);
-      items.push(item);
-    }
-    return { items, hasMore: Boolean(payload.hasMore) };
+    return payload;
   }
 
-  const FEEDS = { latest: "Latest" };
+  function searchWords(text) {
+    const words = [];
+    const seen = new Set();
+    for (const token of String(text || "").toLowerCase().split(/[^a-z0-9]+/)) {
+      if (token.length < 3 || SEARCH_STOPWORDS.has(token) || seen.has(token)) continue;
+      seen.add(token);
+      words.push(token);
+      if (words.length >= 6) break;
+    }
+    return words;
+  }
 
-  async function listingPage(page = 1) {
+  async function searchResults(query, page = 1) {
+    const text = String(query || "").trim();
+    if (!text) return { items: [], hasMore: false };
+    const requestedPage = Number(page);
+    if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
+      throw new Error("NovelFrance search pagination page is invalid.");
+    }
+    const skip = (requestedPage - 1) * SEARCH_PAGE_SIZE;
+    if (!Number.isSafeInteger(skip)) throw new Error("NovelFrance search pagination is invalid.");
+    const payload = await requestSearch(text, skip);
+    const items = collectSearchItems(payload.novels);
+    if (items.length > 0 || requestedPage !== 1) return { items, hasMore: Boolean(payload.hasMore) };
+    // The site search only matches single words: a multi-word query that
+    // returns nothing is retried word by word and intersected (strict AND),
+    // so "lord of the mysteries" still finds its novel.
+    const words = searchWords(text);
+    if (words.length < 2) return { items, hasMore: false };
+    const perWord = [];
+    for (const word of words) {
+      const wordPayload = await requestSearch(word, 0);
+      perWord.push(wordPayload.novels);
+    }
+    const counts = new Map();
+    const bySlug = new Map();
+    for (const novels of perWord) {
+      const seenInWord = new Set();
+      for (const novel of novels) {
+        const slug = novel && typeof novel.slug === "string" ? novel.slug.toLowerCase() : "";
+        if (!slug || seenInWord.has(slug)) continue;
+        seenInWord.add(slug);
+        counts.set(slug, (counts.get(slug) || 0) + 1);
+        if (!bySlug.has(slug)) bySlug.set(slug, novel);
+      }
+    }
+    const intersection = perWord[0]
+      .map((novel) => String((novel && novel.slug) || "").toLowerCase())
+      .filter((slug, index, all) => slug && counts.get(slug) === perWord.length && all.indexOf(slug) === index)
+      .map((slug) => bySlug.get(slug));
+    return { items: collectSearchItems(intersection), hasMore: false };
+  }
+
+  const FEEDS = { popular: "Popular", latest: "Latest" };
+  const FEED_SORT = { popular: "views", latest: "" };
+  const SEARCH_STOPWORDS = new Set([
+    "a", "an", "and", "au", "aux", "de", "des", "du", "en", "et",
+    "in", "la", "le", "les", "of", "on", "the", "to", "un", "une",
+  ]);
+
+  async function listingPage(feed, page = 1) {
     const requestedPage = Number(page);
     if (!Number.isSafeInteger(requestedPage) || requestedPage < 1) {
       throw new Error("NovelFrance discovery pagination page is invalid.");
     }
     const skip = (requestedPage - 1) * SEARCH_PAGE_SIZE;
     if (!Number.isSafeInteger(skip)) throw new Error("NovelFrance discovery pagination is invalid.");
-    const payload = await requestJSON(`${API_URL}/novels?skip=${skip}&take=${SEARCH_PAGE_SIZE}`);
+    const sort = FEED_SORT[feed] ? `&sort=${FEED_SORT[feed]}` : "";
+    const payload = await requestJSON(`${API_URL}/novels?skip=${skip}&take=${SEARCH_PAGE_SIZE}${sort}`);
     if (!payload || !Array.isArray(payload.novels)) throw new Error("NovelFrance discovery returned no novel list.");
     if (!Number.isSafeInteger(payload.total) || payload.total < 0) {
       throw new Error("NovelFrance discovery pagination metadata was invalid.");
@@ -367,8 +422,13 @@
   }
 
   async function discoveryHome() {
-    const latest = await listingPage(1);
-    return { sections: [{ id: "latest", title: FEEDS.latest, items: latest.items }] };
+    const [popular, latest] = await Promise.all([listingPage("popular", 1), listingPage("latest", 1)]);
+    return {
+      sections: [
+        { id: "popular", title: FEEDS.popular, items: popular.items },
+        { id: "latest", title: FEEDS.latest, items: latest.items },
+      ],
+    };
   }
 
   async function discoveryFeed(feedID, page = 1) {
@@ -376,7 +436,7 @@
     if (!Object.prototype.hasOwnProperty.call(FEEDS, feed)) {
       throw new Error("NovelFrance discovery feed is unknown.");
     }
-    return listingPage(page);
+    return listingPage(feed, page);
   }
 
   async function extractDetails(id) {
