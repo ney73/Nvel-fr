@@ -40,6 +40,7 @@ function router(fixtures) {
     if (parsed.pathname === "/notre_catalogue") return response(fixtures.catalogue);
     if (parsed.pathname === "/creations_originales") return response(fixtures.originals);
     if (parsed.pathname === "/notre_catalogue/Fixture_Dawn_A") return response(fixtures.novel);
+    if (parsed.pathname === "/notre_catalogue/Fixture_Flat") return response(fixtures.flat);
     if (parsed.pathname === "/notre_catalogue/Fixture_Unsafe") return response(fixtures.unsafe);
     if (parsed.pathname === "/notre_catalogue/Fixture_Empty") return response(fixtures.empty);
     if (parsed.pathname.endsWith("/chapitre-un")) return response(fixtures.chapter);
@@ -219,6 +220,28 @@ test("NovelDeLAube degrades challenge and empty responses to empty lists", async
   ] });
   const emptyModule = await load(async () => response(""));
   assert.deepEqual(plain(await emptyModule.discoveryFeed("catalogue", 1)), { items: [], hasMore: false });
+});
+
+test("NovelDeLAube detects volumes in flat chapter lists without Tome headings", async () => {
+  const flat = await fixture("novel-flat.html");
+  const module = await load(async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/notre_catalogue/Fixture_Flat") return response(flat);
+    throw new Error(`Unexpected URL: ${url}`);
+  });
+
+  const chapters = await module.extractChapters("Fixture_Flat");
+  assert.deepEqual(plain(chapters.map(({ number, title }) => ({ number, title }))), [
+    { number: 1, title: "Tome 1 - Prologue" },
+    { number: 2, title: "Tome 1 - Chapitre 1" },
+    { number: 3, title: "Tome 1 - Chapitre 2" },
+    { number: 4, title: "Tome 1 - Postface" },
+    { number: 5, title: "Tome 2 - Prologue" },
+    { number: 6, title: "Tome 2 - Chapitre 1" },
+    { number: 7, title: "Tome 2 - Bonus" },
+    { number: 8, title: "Tome 2 - Chapitre 12" },
+    { number: 9, title: "Tome 3 - Chapitre 2" },
+  ]);
 });
 
 test("NovelDeLAube maps Saijo no Osewa to its Rich Girl Caretaker display title", async () => {

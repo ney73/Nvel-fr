@@ -599,6 +599,44 @@
     return chapters;
   }
 
+  // Fallback volume detector for flat chapter lists without Tome headings.
+  // A new volume starts at 1 and increments when a volume opener (Prologue,
+  // Chapitre 1, ...) follows a volume closer (Postface, Épilogue, Bonus),
+  // or when chapter numbers reset/decrease. "Fin du ..." style mid-volume
+  // titles are deliberately NOT closers.
+  const VOLUME_START = /^(prologue|chapitre\s*1\b|chapter\s*1\b|life\s*0\b|acte\s*1\b|partie\s*1\b)/i;
+  const VOLUME_END = /^(postface|epilogue|extra|bonus|conclusion|afterword)/i;
+
+  function chapterTrailingNumber(title) {
+    const match = String(title || "").match(/(\d+)(?!.*\d)/);
+    return match ? Number(match[1]) : null;
+  }
+
+  function assignFallbackVolumes(chapters) {
+    let volume = 1;
+    let prevEnd = false;
+    let prevNumber = null;
+    return chapters.map((chapter, index) => {
+      const title = chapter.title;
+      const isStart = VOLUME_START.test(title);
+      const isEnd = VOLUME_END.test(title);
+      const number = chapterTrailingNumber(title);
+      if (index > 0 && isStart && prevEnd) {
+        volume += 1;
+      } else if (index > 0 && prevNumber !== null && number !== null && number < prevNumber) {
+        volume += 1;
+      }
+      prevEnd = isEnd;
+      prevNumber = number;
+      return { ref: chapter.ref, title, volume };
+    });
+  }
+
+  function withVolumePrefix(title, volume) {
+    if (/^\s*tome\s*\d+\s*-/i.test(title)) return title;
+    return `Tome ${volume} - ${title}`;
+  }
+
   async function extractChapters(id) {
     const slug = normalizeNovelSlug(id);
     const cacheKey = slug.toLowerCase();
@@ -608,10 +646,31 @@
     const html = await requestHTML(pageURL);
     const parsed = parseTomeChapters(html, pageURL);
     if (parsed.length === 0) throw new Error("NovelDeLAube returned no chapter list.");
+    // Chapters under a Tome heading use its number; runs without any
+    // heading (flat lists, or a leading run before the first heading) go
+    // through the fallback detector starting at volume 1.
+    const withVolumes = [];
+    let run = [];
+    const flushRun = () => {
+      if (run.length === 0) return;
+      for (const chapter of assignFallbackVolumes(run)) {
+        withVolumes.push({ ref: chapter.ref, title: withVolumePrefix(chapter.title, chapter.volume) });
+      }
+      run = [];
+    };
+    for (const chapter of parsed) {
+      if (chapter.tome) {
+        flushRun();
+        withVolumes.push({ ref: chapter.ref, title: withVolumePrefix(chapter.title, chapter.tome.number) });
+      } else {
+        run.push(chapter);
+      }
+    }
+    flushRun();
     const seen = new Set();
     const output = [];
     let number = 0;
-    for (const chapter of parsed) {
+    for (const chapter of withVolumes) {
       if (seen.has(chapter.ref.href)) continue;
       seen.add(chapter.ref.href);
       number += 1;
@@ -620,9 +679,7 @@
         href: chapter.ref.href,
         url: chapter.ref.href,
         number,
-        title: chapter.tome && chapter.tome.title
-          ? `Tome ${chapter.tome.number} - ${chapter.title}`
-          : chapter.title,
+        title: chapter.title,
         language: "fr",
       });
     }
