@@ -245,16 +245,76 @@
     return items;
   }
 
+  function parseCards(html, pageURL) {
+    // Catalogue cards observed live: <div class="card kado_project ...">
+    // carrying the cover <img>, an <h3> title, labelled fields, and a
+    // "voirplus-project" link. Cards are split on the container opener so
+    // one malformed card can never poison its neighbours.
+    const items = [];
+    const seen = new Set();
+    const segments = String(html || "").split('<div class="card kado_project');
+    for (let index = 1; index < segments.length; index += 1) {
+      const card = segments[index];
+      const link = card.match(/<a[^>]*class="[^"]*voirplus-project[^"]*"[^>]*href="([^"]+)"[^>]*>/i)
+        || card.match(/<a[^>]*href="([^"]+)"[^>]*class="[^"]*voirplus-project[^"]*"[^>]*>/i);
+      if (!link) continue;
+      const href = absoluteURL(decodeEntities(link[1]).trim(), pageURL);
+      if (!href) continue;
+      let slug = "";
+      try {
+        slug = normalizeNovelSlug(href);
+      } catch (_) {
+        continue;
+      }
+      if (seen.has(slug)) continue;
+      const title = cleanText((card.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i) || [])[1] || "").replace(/^📕\s*/, "");
+      if (!title) continue;
+      const imageTag = card.match(/<img[^>]*src="([^"]+)"[^>]*>/i);
+      const image = imageTag ? absoluteURL(decodeEntities(imageTag[1]).trim(), pageURL) : "";
+      const author = fieldValue(card, "Auteur") || fieldValue(card, "Artiste");
+      const genreText = fieldValue(card, "Genre");
+      const genres = genreText ? genreText.split(",").map((genre) => cleanText(genre)).filter(Boolean) : [];
+      const rawStatus = fieldValue(card, "État du projet") || fieldValue(card, "Etat du projet");
+      const entry = { slug, href, title, image, author, genres, status: rawStatus };
+      const item = safeCatalogueItem(entry);
+      if (!item) continue;
+      seen.add(slug);
+      items.push(item);
+    }
+    return items;
+  }
+
   function safeCatalogueItem(entry) {
     if (!entry || typeof entry !== "object") return null;
     try {
       const title = cleanText(entry.title);
       if (!title) return null;
-      if (hasUnsafeMarker(title)) return null;
       const slug = normalizeNovelSlug(entry.slug);
       const href = absoluteURL(entry.href);
       if (!href) return null;
-      return { id: slug, href, url: href, title, language: "fr" };
+      // Explicit sexual markers are excluded everywhere, including title
+      // and genre labels. Broad maturity/romance-subgenre tags (Ecchi,
+      // Harem, Yuri, Mature, Romance, Fantasy, School Life) are mainstream
+      // on this catalogue and never block a title on their own.
+      const genres = Array.isArray(entry.genres)
+        ? [...new Set(entry.genres.map((genre) => cleanText(genre)).filter(Boolean))]
+        : [];
+      if ([...genres, title].some(hasUnsafeMarker)) return null;
+      const author = cleanText(entry.author);
+      const rawStatus = cleanText(entry.status);
+      const item = {
+        id: slug,
+        href,
+        url: href,
+        title,
+        image: absoluteURL(entry.image) || "",
+        author,
+        authors: author ? [author] : [],
+        genres,
+        status: STATUS_MAP[rawStatus.toLowerCase()] || rawStatus,
+        language: "fr",
+      };
+      return item;
     } catch (_) {
       return null;
     }
@@ -270,28 +330,32 @@
     }
     // The catalogue lives on a single page; only page 1 carries items.
     if (requestedPage !== 1) return { items: [], hasMore: false };
-    const html = await requestHTML(`${BASE_URL}${FEED_PATHS[feed]}`);
-    const items = parseCatalogueList(html)
-      .map(safeCatalogueItem)
-      .filter(Boolean);
-    return { items, hasMore: false };
+    // Browsing must never crash the source screen: any fetch or parse
+    // failure degrades to an empty list. Challenge, login and malformed
+    // content on detail/chapter paths still fail closed elsewhere.
+    try {
+      const pageURL = `${BASE_URL}${FEED_PATHS[feed]}`;
+      const html = await requestHTML(pageURL);
+      const cards = parseCards(html, pageURL);
+      if (cards.length > 0) return { items: cards, hasMore: false };
+      const listed = parseCatalogueList(html)
+        .map((listedEntry) => safeCatalogueItem({ ...listedEntry, image: "", genres: [] }))
+        .filter(Boolean);
+      return { items: listed, hasMore: false };
+    } catch (_) {
+      return { items: [], hasMore: false };
+    }
   }
 
   async function discoveryHome() {
-    // One feed must never take down the other: a section is included only
-    // when its page loads, and Discover fails solely when every feed fails.
-    const [catalogue, originals] = await Promise.allSettled([feedPage("catalogue", 1), feedPage("originals", 1)]);
-    const sections = [];
-    if (catalogue.status === "fulfilled") {
-      sections.push({ id: "catalogue", title: FEEDS.catalogue, items: catalogue.value.items });
-    }
-    if (originals.status === "fulfilled") {
-      sections.push({ id: "originals", title: FEEDS.originals, items: originals.value.items });
-    }
-    if (sections.length === 0) {
-      throw catalogue.reason instanceof Error ? catalogue.reason : new Error("NovelDeLAube discovery failed.");
-    }
-    return { sections };
+    const catalogue = await feedPage("catalogue", 1);
+    const originals = await feedPage("originals", 1);
+    return {
+      sections: [
+        { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
+        { id: "originals", title: FEEDS.originals, items: originals.items },
+      ],
+    };
   }
 
   async function discoveryFeed(feedID, page = 1) {
@@ -307,32 +371,26 @@
     }
     if (!text || requestedPage !== 1) return { items: [], hasMore: false };
     // The site exposes no search endpoint: filter the full catalogue
-    // client-side with an accent-insensitive substring match. A failing
-    // feed page is skipped; search fails solely when every feed fails.
+    // client-side with an accent-insensitive substring match.
     const folded = fold(text);
     if (!folded) return { items: [], hasMore: false };
-    const [catalogue, originals] = await Promise.allSettled([feedPage("catalogue", 1), feedPage("originals", 1)]);
-    const pages = [catalogue, originals]
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => result.value);
-    if (pages.length === 0) {
-      throw catalogue.reason instanceof Error ? catalogue.reason : new Error("NovelDeLAube search failed.");
-    }
+    const catalogue = await feedPage("catalogue", 1);
+    const originals = await feedPage("originals", 1);
     const seen = new Set();
     const items = [];
-    for (const page of pages) {
-      for (const item of page.items) {
-        if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
-        seen.add(item.id);
-        items.push(item);
-      }
+    for (const item of [...catalogue.items, ...originals.items]) {
+      if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
+      seen.add(item.id);
+      items.push(item);
     }
     return { items, hasMore: false };
   }
 
   function fieldValue(html, label) {
+    // Labels render as "Genre<!-- -->:" on novel pages and "Genre :" on
+    // catalogue cards; both shapes are accepted.
     const pattern = new RegExp(
-      `<div[^>]*>\\s*${label}<!-- -->:</div>\\s*<div[^>]*>([\\s\\S]*?)</div>`,
+      `<div[^>]*>\\s*${label}\\s*(?:<!-- -->)?\\s*:</div>\\s*<div[^>]*>([\\s\\S]*?)</div>`,
       "i",
     );
     const match = String(html || "").match(pattern);

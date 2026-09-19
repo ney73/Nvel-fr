@@ -62,6 +62,13 @@ test("NovelDeLAube discovery, search, details, chapters and text match expected.
   const module = await load(router(fixtures));
 
   assert.deepEqual(plain(await module.discoveryHome()), expected.discovery);
+  for (const section of expected.discovery.sections) {
+    for (const item of section.items) {
+      assert.ok(item.id && item.title && item.href && typeof item.image === "string", "item schema");
+      assert.match(item.href, /^https:\/\/[^/]*noveldelaube\.com\//);
+      assert.ok(item.image === "" || item.image.startsWith("https://"), "cover must be HTTPS");
+    }
+  }
   assert.deepEqual(plain(await module.discoveryFeed("catalogue", 1)), {
     items: expected.discovery.sections[0].items,
     hasMore: false,
@@ -124,7 +131,7 @@ test("NovelDeLAube uses only bridge-safe request headers", async () => {
   }
 });
 
-test("NovelDeLAube serves the surviving feed when one catalogue page fails", async () => {
+test("NovelDeLAube degrades failed feeds to empty lists instead of throwing", async () => {
   const catalogue = await fixture("catalogue.html");
   const module = await load(async (url) => {
     const parsed = new URL(url);
@@ -133,8 +140,12 @@ test("NovelDeLAube serves the surviving feed when one catalogue page fails", asy
   });
 
   const home = await module.discoveryHome();
-  assert.deepEqual(plain(home.sections.map(({ id }) => ({ id }))), [{ id: "catalogue" }]);
+  assert.deepEqual(plain(home.sections.map(({ id }) => ({ id }))), [
+    { id: "catalogue" },
+    { id: "originals" },
+  ]);
   assert.equal(home.sections[0].items.length, 2);
+  assert.deepEqual(plain(home.sections[1].items), []);
   const search = await module.searchResults("dawn", 1);
   assert.deepEqual(plain(search.items.map(({ id }) => ({ id }))), [
     { id: "Fixture_Dawn_A" },
@@ -144,16 +155,35 @@ test("NovelDeLAube serves the surviving feed when one catalogue page fails", asy
   const downModule = await load(async () => {
     throw new Error("NovelDeLAube catalogue page failed with HTTP 500.");
   });
-  await assert.rejects(() => downModule.discoveryHome(), /HTTP 500/);
-  await assert.rejects(() => downModule.searchResults("dawn", 1), /HTTP 500/);
+  assert.deepEqual(plain(await downModule.discoveryHome()), { sections: [
+    { id: "catalogue", title: "Catalogue", items: [] },
+    { id: "originals", title: "Originals", items: [] },
+  ] });
+  assert.deepEqual(plain(await downModule.searchResults("dawn", 1)), { items: [], hasMore: false });
 });
 
-test("NovelDeLAube rejects browser challenges and empty responses", async () => {
+test("NovelDeLAube falls back to the embedded novel list when cards are absent", async () => {
+  const html = '<html><body><script type="application/ld+json">'
+    + '{"@context":"https://schema.org","@type":"CollectionPage",'
+    + '"mainEntity":{"@type":"ItemList","itemListElement":['
+    + '{"@type":"ListItem","position":1,"url":"https://www.noveldelaube.com/notre_catalogue/Fixture_Legacy","name":"Fixture Legacy"}'
+    + ']}}</script></body></html>';
+  const module = await load(async () => response(html));
+  const feed = await module.discoveryFeed("catalogue", 1);
+  assert.deepEqual(plain(feed.items.map(({ id, title, image }) => ({ id, title, image }))), [
+    { id: "Fixture_Legacy", title: "Fixture Legacy", image: "" },
+  ]);
+});
+
+test("NovelDeLAube degrades challenge and empty responses to empty lists", async () => {
   const challenge = await fixture("challenge.html");
   const module = await load(async () => response(challenge));
-  await assert.rejects(() => module.discoveryHome(), /challenge/i);
+  assert.deepEqual(plain(await module.discoveryHome()), { sections: [
+    { id: "catalogue", title: "Catalogue", items: [] },
+    { id: "originals", title: "Originals", items: [] },
+  ] });
   const emptyModule = await load(async () => response(""));
-  await assert.rejects(() => emptyModule.discoveryHome(), /empty response/i);
+  assert.deepEqual(plain(await emptyModule.discoveryFeed("catalogue", 1)), { items: [], hasMore: false });
 });
 
 test("NovelDeLAube manifest pins the entry and a valid neutral PNG icon", async () => {
