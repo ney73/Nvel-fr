@@ -863,10 +863,10 @@
     }
   ],
   "repository": {
-    "homepage": "https://github.com/Synthetiq-HQ/synthetiq-manga-sources",
-    "id": "synthetiq.sources",
-    "name": "Synthetiq Manga Sources",
-    "owner": "Synthetiq-HQ",
+    "homepage": "https://github.com/ney73/Nvel-fr",
+    "id": "ney73.sources",
+    "name": "Ney73 Sources",
+    "owner": "ney73",
     "universalLink": "https://synthetiq.uk/manga/modules"
   },
   "schemaVersion": 1
