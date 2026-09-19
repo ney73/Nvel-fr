@@ -9,7 +9,7 @@
   },
   "baseURL": "https://noveldelaube.com",
   "capabilities": [
-    "catalogue",
+    "catalog",
     "originals",
     "search",
     "details",
@@ -44,5 +44,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://noveldelaube.com",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
