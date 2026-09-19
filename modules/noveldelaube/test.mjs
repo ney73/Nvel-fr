@@ -221,6 +221,37 @@ test("NovelDeLAube degrades challenge and empty responses to empty lists", async
   assert.deepEqual(plain(await emptyModule.discoveryFeed("catalogue", 1)), { items: [], hasMore: false });
 });
 
+test("NovelDeLAube maps Saijo no Osewa to its Rich Girl Caretaker display title", async () => {
+  const card = (slug, title) => '<div class="card kado_project"><div class="row">'
+    + `<img src="https://www.noveldelaube.com/images/image_project/${slug}.webp" alt="${title}"/>`
+    + `<h3 class="card-title h3-project">${title}</h3>`
+    + '<div class="col-12 col-xl-5 fw-bold">Genre :</div><div class="col-12 col-xl-7">Comédie, Romance, School Life</div>'
+    + `<a class="btn btn-secondary voirplus-project" href="/notre_catalogue/${slug}">Voir plus »</a>`
+    + "</div></div>";
+  const html = `<html><body>${card("Saijo_no_Osewa", "Saijo no Osewa - Takane no Hana")}</body></html>`;
+  const module = await load(async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/creations_originales") return response("<html></html>");
+    return response(html);
+  });
+
+  const home = await module.discoveryHome();
+  assert.equal(home.sections[0].items[0].title, "Rich Girl Caretaker");
+  assert.equal(home.sections[0].items[0].id, "Saijo_no_Osewa");
+  assert.deepEqual(
+    plain((await module.searchResults("Rich Girl Caretaker", 1)).items.map(({ id }) => ({ id }))),
+    [{ id: "Saijo_no_Osewa" }],
+  );
+  assert.deepEqual(
+    plain((await module.searchResults("Saijo no Osewa", 1)).items.map(({ id }) => ({ id }))),
+    [{ id: "Saijo_no_Osewa" }],
+  );
+  assert.deepEqual(
+    plain((await module.searchResults("saijo", 1)).items.map(({ id }) => ({ id }))),
+    [{ id: "Saijo_no_Osewa" }],
+  );
+});
+
 test("NovelDeLAube manifest pins the entry and a valid neutral PNG icon", async () => {
   const manifest = JSON.parse(await readFile(path.join(root, "manifest.json"), "utf8"));
   const entry = await readFile(path.join(root, "index.js"));

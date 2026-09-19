@@ -37,6 +37,19 @@
     "lime",
   ];
   const STATUS_MAP = { "terminé": "Completed", "en cours": "Ongoing", "en attente": "On hold" };
+  // Display-title aliases: when a catalogue title contains the match text,
+  // readers see the alias instead. Matching is accent-insensitive.
+  const TITLE_ALIASES = [
+    { match: "saijo no osewa", title: "Rich Girl Caretaker" },
+  ];
+
+  function displayTitle(rawTitle) {
+    const folded = fold(rawTitle);
+    for (const alias of TITLE_ALIASES) {
+      if (folded.includes(alias.match)) return alias.title;
+    }
+    return rawTitle;
+  }
   const FEEDS = { all: "Catalogue", originals: "Originals" };
   const FEED_PATHS = { all: CATALOGUE_PATH, originals: ORIGINALS_PATH };
 
@@ -355,8 +368,8 @@
   function safeCatalogueItem(entry) {
     if (!entry || typeof entry !== "object") return null;
     try {
-      const title = cleanText(entry.title);
-      if (!title) return null;
+      const rawTitle = cleanText(entry.title);
+      if (!rawTitle) return null;
       const slug = normalizeNovelSlug(entry.slug);
       const href = absoluteURL(entry.href);
       if (!href) return null;
@@ -367,7 +380,8 @@
       const genres = Array.isArray(entry.genres)
         ? [...new Set(entry.genres.map((genre) => cleanText(genre)).filter(Boolean))]
         : [];
-      if ([...genres, title].some(hasUnsafeMarker)) return null;
+      if ([...genres, rawTitle].some(hasUnsafeMarker)) return null;
+      const title = displayTitle(rawTitle);
       const author = cleanText(entry.author);
       const rawStatus = cleanText(entry.status);
       const image = absoluteURL(entry.image) || "";
@@ -461,7 +475,9 @@
       const seen = new Set();
       const items = [];
       for (const item of [...catalogue.items, ...originals.items]) {
-        if (seen.has(item.id) || !fold(item.title).includes(folded)) continue;
+        // Match the display title as well as the source slug, so an aliased
+        // novel is found under both its original and its display title.
+        if (seen.has(item.id) || (!fold(item.title).includes(folded) && !fold(item.id).includes(folded))) continue;
         seen.add(item.id);
         items.push(item);
       }
@@ -509,12 +525,13 @@
     const pageTitle = cleanText((html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || "")
       .replace(/\s*[|-]\s*Novel de l'Aube.*$/i, "")
       .replace(/^📕\s*/, "");
-    const title = pageTitle || cleanText(slug.replace(/_/g, " "));
-    if (!title) throw new Error("NovelDeLAube title is empty after cleaning.");
+    const rawTitle = pageTitle || cleanText(slug.replace(/_/g, " "));
+    if (!rawTitle) throw new Error("NovelDeLAube title is empty after cleaning.");
     const author = fieldValue(html, "Auteur") || fieldValue(html, "Artiste");
     const genreText = fieldValue(html, "Genre");
     const genres = genreText ? genreText.split(",").map((genre) => cleanText(genre)).filter(Boolean) : [];
-    assertSafeGenres(genres, title);
+    assertSafeGenres(genres, rawTitle);
+    const title = displayTitle(rawTitle);
     const rawStatus = fieldValue(html, "État du projet") || fieldValue(html, "Etat du projet");
     const status = STATUS_MAP[rawStatus.toLowerCase()] || rawStatus;
     let description = "";
