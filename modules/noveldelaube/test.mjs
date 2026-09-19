@@ -107,8 +107,9 @@ test("NovelDeLAube rejects unsafe, empty, challenge and invalid inputs", async (
   await assert.rejects(() => module.extractText("not a url \\"), /identifier|host/i);
   assert.deepStrictEqual(
     plain(await module.discoveryFeed("unknown", 1)),
-    { items: [], hasMore: false },
+    plain(await module.discoveryFeed("all", 1)),
   );
+  assert.ok((await module.discoveryFeed("all", 1)).items.length > 0, "default feed must be non-empty");
   assert.deepStrictEqual(
     plain(await module.discoveryFeed("catalogue", 0)),
     plain(await module.discoveryFeed("catalogue", 1)),
@@ -152,7 +153,7 @@ test("NovelDeLAube degrades failed feeds to empty lists instead of throwing", as
 
   const home = await module.discoveryHome();
   assert.deepEqual(plain(home.sections.map(({ id }) => ({ id }))), [
-    { id: "catalogue" },
+    { id: "all" },
     { id: "originals" },
   ]);
   assert.equal(home.sections[0].items.length, 2);
@@ -167,7 +168,7 @@ test("NovelDeLAube degrades failed feeds to empty lists instead of throwing", as
     throw new Error("NovelDeLAube catalogue page failed with HTTP 500.");
   });
   assert.deepEqual(plain(await downModule.discoveryHome()), { sections: [
-    { id: "catalogue", title: "Catalogue", items: [] },
+    { id: "all", title: "Catalogue", items: [] },
     { id: "originals", title: "Originals", items: [] },
   ] });
   assert.deepEqual(plain(await downModule.searchResults("dawn", 1)), { items: [], hasMore: false });
@@ -213,7 +214,7 @@ test("NovelDeLAube degrades challenge and empty responses to empty lists", async
   const challenge = await fixture("challenge.html");
   const module = await load(async () => response(challenge));
   assert.deepEqual(plain(await module.discoveryHome()), { sections: [
-    { id: "catalogue", title: "Catalogue", items: [] },
+    { id: "all", title: "Catalogue", items: [] },
     { id: "originals", title: "Originals", items: [] },
   ] });
   const emptyModule = await load(async () => response(""));

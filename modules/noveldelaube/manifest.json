@@ -21,7 +21,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/noveldelaube/index.js",
-    "sha256": "b993e879440e8988f24c157750e2dcc9348f77e36decabb54a41a469b56309b3"
+    "sha256": "8ae4e94813e54b0ba908aeb7807c613d61265e5017e6f87685127c5743a07ff5"
   },
   "familyID": "noveldelaube-v1",
   "icon": {
@@ -43,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://noveldelaube.com",
-  "version": "0.2.0"
+  "version": "0.2.1"
 }

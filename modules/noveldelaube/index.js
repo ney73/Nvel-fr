@@ -37,8 +37,19 @@
     "lime",
   ];
   const STATUS_MAP = { "terminé": "Completed", "en cours": "Ongoing", "en attente": "On hold" };
-  const FEEDS = { catalogue: "Catalogue", originals: "Originals" };
-  const FEED_PATHS = { catalogue: CATALOGUE_PATH, originals: ORIGINALS_PATH };
+  const FEEDS = { all: "Catalogue", originals: "Originals" };
+  const FEED_PATHS = { all: CATALOGUE_PATH, originals: ORIGINALS_PATH };
+
+  function resolveFeed(feedID) {
+    // The catalogue is the default feed: whatever feed name a client asks
+    // for ("all", "catalogue", "popular", ...), it receives the full novel
+    // list instead of an empty screen. Feed names are routing hints, and a
+    // wrong hint must never cost the user their library.
+    const feed = String(feedID || "").trim().toLowerCase();
+    if (feed === "catalogue") return "all";
+    if (Object.prototype.hasOwnProperty.call(FEEDS, feed)) return feed;
+    return "all";
+  }
   const detailsCache = new Map();
   const chaptersCache = new Map();
 
@@ -417,10 +428,10 @@
 
   async function discoveryHome() {
     try {
-      const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
+      const [all, originals] = await Promise.all([safeFeed("all", 1), safeFeed("originals", 1)]);
       return {
         sections: [
-          { id: "catalogue", title: FEEDS.catalogue, items: catalogue.items },
+          { id: "all", title: FEEDS.all, items: all.items },
           { id: "originals", title: FEEDS.originals, items: originals.items },
         ],
       };
@@ -430,9 +441,8 @@
   }
 
   async function discoveryFeed(feedID, page = 1) {
-    const feed = String(feedID || "").trim().toLowerCase();
     try {
-      return await feedPage(feed, page);
+      return await feedPage(resolveFeed(feedID), page);
     } catch (_) {
       return { items: [], hasMore: false };
     }
@@ -447,7 +457,7 @@
     const folded = fold(text);
     if (!folded) return { items: [], hasMore: false };
     try {
-      const [catalogue, originals] = await Promise.all([safeFeed("catalogue", 1), safeFeed("originals", 1)]);
+      const [catalogue, originals] = await Promise.all([safeFeed("all", 1), safeFeed("originals", 1)]);
       const seen = new Set();
       const items = [];
       for (const item of [...catalogue.items, ...originals.items]) {
