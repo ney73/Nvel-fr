@@ -44,15 +44,15 @@
       "id": "novelneko-v1",
       "familyID": "novelneko-v1",
       "name": "Novel Neko",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "language": "fr",
-      "contentType": "text",
+      "contentType": "publication",
       "contentRating": "suggestive",
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
         "path": "modules/novelneko/manifest.json",
-        "sha256": "3be66908cc961edc07334a6261b0d353b4a044b92d3e2dd8de9cb077e253023a"
+        "sha256": "ebb99d90d5e485f5847c3a068548610362de8f35da7c03eb4601cbf9cc1d13d6"
       },
       "icon": {
         "path": "modules/novelneko/icon.png",

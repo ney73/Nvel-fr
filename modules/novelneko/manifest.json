@@ -12,14 +12,15 @@
     "details",
     "chapters",
     "text",
+    "resources",
     "discovery"
   ],
   "contentRating": "suggestive",
-  "contentType": "text",
+  "contentType": "publication",
   "contractVersion": 1,
   "entry": {
     "path": "modules/novelneko/index.js",
-    "sha256": "99c14e9553447721fe663081941288195e3b9ceab6549c8379a90e887f6747dc"
+    "sha256": "59c67ee47506b156f883aec79c121d300f739f9849660e14633a92fc8d4c8d4d"
   },
   "familyID": "novelneko-v1",
   "icon": {
@@ -41,5 +42,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelneko.fr",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

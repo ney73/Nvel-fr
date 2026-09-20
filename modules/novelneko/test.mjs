@@ -36,8 +36,11 @@ function router(fixtures) {
     assert.equal(parsed.protocol, "https:");
     assert.equal(parsed.hostname, "novelneko.fr", `unapproved host ${parsed.hostname}`);
     if (parsed.pathname === "/webnovels/webnovel.json") return response(fixtures.catalogue);
+    if (parsed.pathname === "/lightnovels/lightnovel.json") return response(fixtures.lightCatalogue);
     if (parsed.pathname === "/webnovels/fixture-aurore/") return response(fixtures.novel);
     if (parsed.pathname === "/webnovels/fixture-brume/") return response(fixtures.brume);
+    if (parsed.pathname === "/lightnovels/fixture-clair/") return response(fixtures.lightNovel);
+    if (parsed.pathname === "/lightnovels/fixture-lueur/") return response(fixtures.lightNovel);
     if (parsed.pathname === "/webnovels/fixture-unsafe/") return response(fixtures.unsafe);
     if (parsed.pathname === "/webnovels/fixture-empty/") return response(fixtures.empty);
     if (parsed.pathname === "/webnovels/fixture-aurore/chapters/chapitre_001.txt") {
@@ -53,7 +56,9 @@ function router(fixtures) {
 test("NovelNeko discovery, search, details, chapters and text match expected.json", async () => {
   const fixtures = {
     catalogue: await fixture("webnovel.json"),
+    lightCatalogue: await fixture("lightnovel.json"),
     novel: await fixture("novel.html"),
+    lightNovel: await fixture("light-novel.html"),
     brume: await fixture("novel-brume.html"),
     unsafe: await fixture("novel-unsafe.html"),
     empty: await fixture("novel-empty.html"),
@@ -70,13 +75,25 @@ test("NovelNeko discovery, search, details, chapters and text match expected.jso
       assert.ok(item.image === "" || item.image.startsWith("https://"), "cover must be HTTPS");
     }
   }
-  // Duplicates, unsafe titles and untitled entries never reach the catalogue.
+  // Duplicates, unsafe titles and untitled entries never reach either catalogue.
   assert.deepEqual(
     plain((await module.discoveryHome()).sections[0].items.map(({ id }) => ({ id }))),
     [{ id: "fixture-aurore" }, { id: "fixture-brume" }],
   );
+  assert.deepEqual(
+    plain((await module.discoveryHome()).sections[1].items.map(({ id }) => ({ id }))),
+    [{ id: "lightnovels/fixture-clair" }, { id: "lightnovels/fixture-lueur" }],
+  );
   assert.deepEqual(plain(await module.discoveryFeed("webnovels", 1)), {
     items: expected.discovery.sections[0].items,
+    hasMore: false,
+  });
+  assert.deepEqual(plain(await module.discoveryFeed("lightnovels", 1)), {
+    items: expected.discovery.sections[1].items,
+    hasMore: false,
+  });
+  assert.deepEqual(plain(await module.discoveryFeed("light-novels", 1)), {
+    items: expected.discovery.sections[1].items,
     hasMore: false,
   });
   assert.deepEqual(plain(await module.searchResults("aurore", 1)), expected.search);
@@ -97,12 +114,31 @@ test("NovelNeko discovery, search, details, chapters and text match expected.jso
     await module.extractText("https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1"),
     expected.text,
   );
+  // Light novels: details, complete volume chapters and PDF/EPUB resources.
+  assert.deepEqual(plain(await module.searchResults("clair", 1)), expected.lightSearch);
+  assert.deepEqual(plain(await module.extractDetails("lightnovels/fixture-clair")), expected.lightDetails);
+  assert.deepEqual(
+    plain(await module.extractChapters("https://novelneko.fr/lightnovels/fixture-clair/")),
+    expected.lightChapters,
+  );
+  assert.deepEqual(
+    plain(await module.extractResources("lightnovels/fixture-clair")),
+    expected.lightResources,
+  );
+  for (const resource of expected.lightResources) {
+    assert.ok(["pdf", "epub"].includes(resource.format), "resource format");
+    assert.match(resource.url, /^https:\/\/novelneko\.fr\/lightnovels\//);
+  }
+  // Web novels expose no downloadable publication.
+  assert.deepEqual(plain(await module.extractResources("fixture-aurore")), []);
 });
 
 test("NovelNeko rejects unsafe, empty, challenge and invalid inputs", async () => {
   const fixtures = {
     catalogue: await fixture("webnovel.json"),
+    lightCatalogue: await fixture("lightnovel.json"),
     novel: await fixture("novel.html"),
+    lightNovel: await fixture("light-novel.html"),
     brume: await fixture("novel-brume.html"),
     unsafe: await fixture("novel-unsafe.html"),
     empty: await fixture("novel-empty.html"),
@@ -117,11 +153,20 @@ test("NovelNeko rejects unsafe, empty, challenge and invalid inputs", async () =
     /HTTP 404|unavailable/i,
   );
   await assert.rejects(() => module.extractDetails("https://evil.example/novel/x"), /host|identifier/i);
-  await assert.rejects(() => module.extractDetails("https://novelneko.fr/lightnovels/mushoku-tensei/"), /novel URL|identifier/i);
+  await assert.rejects(() => module.extractDetails("https://novelneko.fr/manga/one-piece/"), /novel URL|identifier/i);
+  await assert.rejects(() => module.extractDetails("lightnovels/fixture-aurore"), /Unexpected URL|failed|empty|malformed/i);
   await assert.rejects(() => module.extractText("not a url \\"), /identifier|host/i);
   await assert.rejects(
     () => module.extractText("https://novelneko.fr/webnovels/fixture-aurore/lecture.html"),
     /chapter number/i,
+  );
+  await assert.rejects(
+    () => module.extractText("https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf"),
+    /not a chapter URL/i,
+  );
+  await assert.rejects(
+    () => module.extractResources("https://evil.example/lightnovels/x/"),
+    /host|identifier/i,
   );
   assert.deepStrictEqual(
     plain(await module.discoveryFeed("unknown", 1)),
@@ -170,7 +215,12 @@ test("NovelNeko degrades failed feeds to empty lists instead of throwing", async
   });
 
   const home = await module.discoveryHome();
-  assert.deepEqual(plain(home), { sections: [{ id: "webnovels", title: "Web-Novels", items: [] }] });
+  assert.deepEqual(plain(home), {
+    sections: [
+      { id: "webnovels", title: "Web-Novels", items: [] },
+      { id: "lightnovels", title: "Light-Novels", items: [] },
+    ],
+  });
   assert.deepEqual(plain(await module.searchResults("aurore", 1)), { items: [], hasMore: false });
 });
 
@@ -178,7 +228,10 @@ test("NovelNeko degrades challenge, empty and malformed responses to empty lists
   const challenge = await fixture("challenge.html");
   const module = await load(async () => response(challenge));
   assert.deepEqual(plain(await module.discoveryHome()), {
-    sections: [{ id: "webnovels", title: "Web-Novels", items: [] }],
+    sections: [
+      { id: "webnovels", title: "Web-Novels", items: [] },
+      { id: "lightnovels", title: "Light-Novels", items: [] },
+    ],
   });
   assert.deepEqual(plain(await module.searchResults("aurore", 1)), { items: [], hasMore: false });
   await assert.rejects(() => module.extractDetails("fixture-aurore"), /challenge/i);

@@ -1,0 +1,31 @@
+[
+  {
+    "title": "Fixture Clair",
+    "image": "fixture-clair/cover.jpg",
+    "link": "fixture-clair/",
+    "subtitle": "3 tomes"
+  },
+  {
+    "title": "Fixture Lueur",
+    "image": "fixture-lueur/cover.jpg",
+    "link": "fixture-lueur/",
+    "subtitle": "1 tome"
+  },
+  {
+    "title": "Fixture Clair",
+    "image": "fixture-clair/cover.jpg",
+    "link": "fixture-clair/",
+    "subtitle": "3 tomes"
+  },
+  {
+    "title": "Smut Interdit",
+    "image": "smut-interdit/cover.jpg",
+    "link": "smut-interdit/",
+    "subtitle": "1 tome"
+  },
+  {
+    "image": "sans-titre/cover.jpg",
+    "link": "sans-titre/",
+    "subtitle": "1 tome"
+  }
+]
