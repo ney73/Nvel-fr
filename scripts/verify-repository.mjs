@@ -9,6 +9,8 @@ const expectedHandlers = {
   "internet-archive": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   "internet-archive-publications": ["searchResults", "extractDetails", "extractResources"],
   "internet-archive-text": ["searchResults", "extractDetails", "extractChapters", "extractText"],
+  novelneko: ["searchResults", "extractDetails", "extractChapters", "extractText"],
+  "novelneko-light": ["searchResults", "extractDetails", "extractResources"],
   lnori: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   witchculttranslation: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   mangafire: ["searchResults", "extractDetails", "extractChapters", "extractImages"],

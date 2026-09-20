@@ -32,38 +32,6 @@
             "language": "fr"
           }
         ]
-      },
-      {
-        "id": "lightnovels",
-        "title": "Light-Novels",
-        "items": [
-          {
-            "id": "lightnovels/fixture-clair",
-            "href": "https://novelneko.fr/lightnovels/fixture-clair/",
-            "url": "https://novelneko.fr/lightnovels/fixture-clair/",
-            "title": "Fixture Clair",
-            "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-            "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-            "author": "",
-            "authors": [],
-            "genres": [],
-            "status": "",
-            "language": "fr"
-          },
-          {
-            "id": "lightnovels/fixture-lueur",
-            "href": "https://novelneko.fr/lightnovels/fixture-lueur/",
-            "url": "https://novelneko.fr/lightnovels/fixture-lueur/",
-            "title": "Fixture Lueur",
-            "image": "https://novelneko.fr/lightnovels/fixture-lueur/cover.jpg",
-            "cover": "https://novelneko.fr/lightnovels/fixture-lueur/cover.jpg",
-            "author": "",
-            "authors": [],
-            "genres": [],
-            "status": "",
-            "language": "fr"
-          }
-        ]
       }
     ]
   },
@@ -100,7 +68,8 @@
     "status": "Ongoing",
     "language": "fr"
   },
-  "chapters": [    {
+  "chapters": [
+    {
       "id": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
       "href": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
       "url": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
@@ -125,98 +94,5 @@
       "language": "fr"
     }
   ],
-  "text": "Chapitre 1\n====================\n\nL'aube se levait sur le port inventé de Clairval, et la cartographe Lina rangeait déjà ses compas dans leur écrin de bois clair.\n\nElle avait passé la nuit à redessiner la baie, car la marée basse révélait un banc de sable en forme d'étoile que personne n'avait remarqué avant elle.\n\n« Une carte n'est jamais finie, disait son grand-père. Elle attend seulement que quelqu'un la regarde vraiment. »\n\nLina sourit, trempa sa plume dans l'encre bleue, et traça la première ligne de sa plus grande aventure.",
-  "lightSearch": {
-    "items": [
-      {
-        "id": "lightnovels/fixture-clair",
-        "href": "https://novelneko.fr/lightnovels/fixture-clair/",
-        "url": "https://novelneko.fr/lightnovels/fixture-clair/",
-        "title": "Fixture Clair",
-        "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-        "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-        "author": "",
-        "authors": [],
-        "genres": [],
-        "status": "",
-        "language": "fr"
-      }
-    ],
-    "hasMore": false
-  },
-  "lightDetails": {
-    "id": "lightnovels/fixture-clair",
-    "href": "https://novelneko.fr/lightnovels/fixture-clair/",
-    "url": "https://novelneko.fr/lightnovels/fixture-clair/",
-    "title": "Fixture Clair",
-    "description": "Fixture Clair raconte l'histoire inventée d'un relieur qui découvre un manuscrit dont les pages se réécrivent chaque nuit. Avec l'aide d'une libraire, il tente de terminer le dernier tome avant la prochaine pleine lune.",
-    "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-    "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
-    "author": "Autrice Fictive",
-    "authors": ["Autrice Fictive"],
-    "translator": "Traducteur Fictif",
-    "genres": ["Aventure", "Romance"],
-    "status": "Completed",
-    "language": "fr"
-  },
-  "lightChapters": [
-    {
-      "id": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf",
-      "href": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf",
-      "number": 1,
-      "title": "Tome 1",
-      "language": "fr"
-    },
-    {
-      "id": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.epub",
-      "href": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.epub",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.epub",
-      "number": 1,
-      "title": "Tome 1 (EPUB)",
-      "language": "fr"
-    },
-    {
-      "id": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome2.pdf",
-      "href": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome2.pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome2.pdf",
-      "number": 2,
-      "title": "Tome 2",
-      "language": "fr"
-    },
-    {
-      "id": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome3.pdf",
-      "href": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome3.pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome3.pdf",
-      "number": 3,
-      "title": "Tome 3",
-      "language": "fr"
-    }
-  ],
-  "lightResources": [
-    {
-      "format": "pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf",
-      "fileName": "Fixture Clair - Tome 1.pdf",
-      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
-    },
-    {
-      "format": "epub",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.epub",
-      "fileName": "Fixture Clair - Tome 1 (EPUB).epub",
-      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
-    },
-    {
-      "format": "pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome2.pdf",
-      "fileName": "Fixture Clair - Tome 2.pdf",
-      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
-    },
-    {
-      "format": "pdf",
-      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome3.pdf",
-      "fileName": "Fixture Clair - Tome 3.pdf",
-      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
-    }
-  ]
+  "text": "Chapitre 1\n====================\n\nL'aube se levait sur le port inventé de Clairval, et la cartographe Lina rangeait déjà ses compas dans leur écrin de bois clair.\n\nElle avait passé la nuit à redessiner la baie, car la marée basse révélait un banc de sable en forme d'étoile que personne n'avait remarqué avant elle.\n\n« Une carte n'est jamais finie, disait son grand-père. Elle attend seulement que quelqu'un la regarde vraiment. »\n\nLina sourit, trempa sa plume dans l'encre bleue, et traça la première ligne de sa plus grande aventure."
 }

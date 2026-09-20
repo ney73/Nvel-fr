@@ -1,0 +1,97 @@
+{
+  "discovery": {
+    "sections": [
+      {
+        "id": "lightnovels",
+        "title": "Light-Novels",
+        "items": [
+          {
+            "id": "fixture-clair",
+            "href": "https://novelneko.fr/lightnovels/fixture-clair/",
+            "url": "https://novelneko.fr/lightnovels/fixture-clair/",
+            "title": "Fixture Clair",
+            "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+            "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          },
+          {
+            "id": "fixture-lueur",
+            "href": "https://novelneko.fr/lightnovels/fixture-lueur/",
+            "url": "https://novelneko.fr/lightnovels/fixture-lueur/",
+            "title": "Fixture Lueur",
+            "image": "https://novelneko.fr/lightnovels/fixture-lueur/cover.jpg",
+            "cover": "https://novelneko.fr/lightnovels/fixture-lueur/cover.jpg",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          }
+        ]
+      }
+    ]
+  },
+  "search": {
+    "items": [
+      {
+        "id": "fixture-clair",
+        "href": "https://novelneko.fr/lightnovels/fixture-clair/",
+        "url": "https://novelneko.fr/lightnovels/fixture-clair/",
+        "title": "Fixture Clair",
+        "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+        "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+        "author": "",
+        "authors": [],
+        "genres": [],
+        "status": "",
+        "language": "fr"
+      }
+    ],
+    "hasMore": false
+  },
+  "details": {
+    "id": "fixture-clair",
+    "href": "https://novelneko.fr/lightnovels/fixture-clair/",
+    "url": "https://novelneko.fr/lightnovels/fixture-clair/",
+    "title": "Fixture Clair",
+    "description": "Fixture Clair raconte l'histoire inventée d'un relieur qui découvre un manuscrit dont les pages se réécrivent chaque nuit. Avec l'aide d'une libraire, il tente de terminer le dernier tome avant la prochaine pleine lune.",
+    "image": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+    "cover": "https://novelneko.fr/lightnovels/fixture-clair/cover.jpg",
+    "author": "Autrice Fictive",
+    "authors": ["Autrice Fictive"],
+    "translator": "Traducteur Fictif",
+    "genres": ["Aventure", "Romance"],
+    "status": "Completed",
+    "language": "fr"
+  },
+  "resources": [
+    {
+      "format": "pdf",
+      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.pdf",
+      "fileName": "Fixture Clair - Tome 1.pdf",
+      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
+    },
+    {
+      "format": "epub",
+      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome1.epub",
+      "fileName": "Fixture Clair - Tome 1 (EPUB).epub",
+      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
+    },
+    {
+      "format": "pdf",
+      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome2.pdf",
+      "fileName": "Fixture Clair - Tome 2.pdf",
+      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
+    },
+    {
+      "format": "pdf",
+      "url": "https://novelneko.fr/lightnovels/fixture-clair/volumes/tome3.pdf",
+      "fileName": "Fixture Clair - Tome 3.pdf",
+      "headers": { "Referer": "https://novelneko.fr/lightnovels/fixture-clair/" }
+    }
+  ]
+}

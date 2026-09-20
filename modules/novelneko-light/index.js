@@ -1,20 +1,15 @@
 "use strict";
 
-// NovelNeko (https://novelneko.fr) — French fan-translation reader module.
-//
-// Scope: the Web-Novels catalogue only. Catalogue entries live in the static
-// JSON index /webnovels/webnovel.json, each novel page
-// (/webnovels/<slug>/) carries its metadata plus a chapter count
-// ("const maxChapitres = N"), chapters are served as plain-text files
-// (/webnovels/<slug>/chapters/chapitre_NNN.txt) rendered by lecture.html.
-// Light-Novels are PDF-only downloads and Mangas are image galleries, so
-// neither fits a text-type module and both are intentionally out of scope.
+// Novel Neko Light (https://novelneko.fr) — French fan-translation publication
+// module for the Light-Novels catalogue: downloadable PDF/EPUB volumes linked
+// as volumes/tomeN.pdf from each novel page. Catalogue entries live in the
+// static JSON index /lightnovels/lightnovel.json. Web novels (online text
+// chapters) are served by the sibling novelneko-v1 text module: one module
+// serves one terminal path, so both formats work instead of competing.
 (() => {
   const BASE_URL = "https://novelneko.fr";
-  const CATALOG_URL = `${BASE_URL}/webnovels/webnovel.json`;
+  const CATALOG_URL = `${BASE_URL}/lightnovels/lightnovel.json`;
   const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
-  const MAX_TEXT_BYTES = 1024 * 1024;
-  const MIN_TEXT_CHARS = 100;
   const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
   const SLUG_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.~-]{0,120}$/;
   const DEFAULT_HEADERS = {
@@ -27,14 +22,9 @@
     "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
     Referer: `${BASE_URL}/`,
   };
-  const TEXT_HEADERS = {
-    Accept: "text/plain,*/*;q=0.8",
-    "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
-    Referer: `${BASE_URL}/`,
-  };
-  // Explicit sexual-content markers only (same doctrine as the NovelFrance
-  // and NovelDeLAube modules): broad maturity/romance-subgenre tags are not
-  // blocked, the module stays rated "suggestive", never "safe".
+  // Explicit sexual-content markers only (same doctrine as the NovelFrance,
+  // NovelDeLAube and NovelNeko text modules): broad maturity/romance-subgenre
+  // tags are not blocked, the module stays rated "suggestive", never "safe".
   const UNSAFE_MARKERS = [
     "r 18",
     "x rated",
@@ -54,22 +44,23 @@
     "lime",
   ];
   const STATUS_MAP = { "terminé": "Completed", "en cours": "Ongoing", "en pause": "On hold" };
-  const FEEDS = { webnovels: "Web-Novels" };
+  const FEEDS = { lightnovels: "Light-Novels" };
 
   function resolveFeed(feedID) {
-    // The web-novel catalogue is the default feed: whatever feed name a
+    // The light-novel catalogue is the default feed: whatever feed name a
     // client asks for, it receives the novel list instead of an empty
     // screen. Feed names are routing hints, and a wrong hint must never
     // cost the user their library.
     const feed = String(feedID || "").trim().toLowerCase();
-    if (feed === "web-novels" || feed === "web novels" || feed === "catalogue" || feed === "all") return "webnovels";
+    if (feed === "light-novels" || feed === "light novels" || feed === "lightnovel"
+      || feed === "light" || feed === "catalogue" || feed === "all") return "lightnovels";
     if (Object.prototype.hasOwnProperty.call(FEEDS, feed)) return feed;
-    return "webnovels";
+    return "lightnovels";
   }
 
   const catalogueCache = { data: null };
   const detailsCache = new Map();
-  const chaptersCache = new Map();
+  const resourcesCache = new Map();
 
   function sleep(milliseconds) {
     return new Promise((resolve) => {
@@ -132,82 +123,30 @@
     }
   }
 
-  function novelPageURL(value) {
-    const slug = normalizeNovelSlug(value);
-    return `${BASE_URL}/webnovels/${slug}/`;
+  function novelPageURL(slug) {
+    return `${BASE_URL}/lightnovels/${slug}/`;
   }
 
   function normalizeNovelSlug(value) {
-    if (typeof value !== "string" || !value.trim()) throw new Error("NovelNeko identifier is invalid.");
+    if (typeof value !== "string" || !value.trim()) throw new Error("Novel Neko Light identifier is invalid.");
     const input = value.trim();
     if (SLUG_PATTERN.test(input)) return input;
     let url;
     try {
       url = new URL(input, BASE_URL);
     } catch (_) {
-      throw new Error("NovelNeko identifier is invalid.");
+      throw new Error("Novel Neko Light identifier is invalid.");
     }
     if (url.protocol !== "https:" || !allowedHost(url.hostname) || url.hash) {
-      throw new Error("NovelNeko identifier host or URL is not allowed.");
+      throw new Error("Novel Neko Light identifier host or URL is not allowed.");
     }
     const segments = url.pathname.split("/").filter(Boolean);
-    // Novel pages live at /webnovels/<slug>/ ; chapter URLs carry the slug
-    // one level up from lecture.html.
-    if (segments.length === 0) throw new Error("NovelNeko identifier is not a novel URL.");
-    const file = segments[segments.length - 1];
-    if (/^lecture\.html$/i.test(file)) {
-      if (segments.length < 2 || segments[segments.length - 2].toLowerCase() !== "webnovels") {
-        throw new Error("NovelNeko identifier is not a novel URL.");
-      }
-      // /webnovels/<slug>/lecture.html -> slug is two levels up.
-      if (segments.length < 3 || !SLUG_PATTERN.test(segments[segments.length - 2])) {
-        throw new Error("NovelNeko identifier is not a novel URL.");
-      }
-      return segments[segments.length - 2];
+    // Light-novel pages live at /lightnovels/<slug>/ only.
+    if (segments.length < 2 || segments[0].toLowerCase() !== "lightnovels") {
+      throw new Error("Novel Neko Light identifier is not a novel URL.");
     }
-    if (segments[0].toLowerCase() !== "webnovels" || segments.length < 2) {
-      throw new Error("NovelNeko identifier is not a novel URL.");
-    }
-    if (!SLUG_PATTERN.test(segments[1])) throw new Error("NovelNeko identifier is invalid.");
+    if (!SLUG_PATTERN.test(segments[1])) throw new Error("Novel Neko Light identifier is invalid.");
     return segments[1];
-  }
-
-  function chapterFileName(number) {
-    return `chapitre_${String(number).padStart(3, "0")}.txt`;
-  }
-
-  function chapterURL(slug, number) {
-    return `${BASE_URL}/webnovels/${slug}/lecture.html?chapitre=${number}`;
-  }
-
-  function chapterTextURL(slug, number) {
-    return `${BASE_URL}/webnovels/${slug}/chapters/${chapterFileName(number)}`;
-  }
-
-  function normalizeChapterReference(value) {
-    if (typeof value !== "string" || !value.trim()) throw new Error("NovelNeko chapter identifier is invalid.");
-    let url;
-    try {
-      url = new URL(value.trim(), BASE_URL);
-    } catch (_) {
-      throw new Error("NovelNeko chapter identifier is invalid.");
-    }
-    if (url.protocol !== "https:" || !allowedHost(url.hostname) || url.hash) {
-      throw new Error("NovelNeko chapter host or URL is not allowed.");
-    }
-    const segments = url.pathname.split("/").filter(Boolean);
-    if (segments.length !== 3
-      || segments[0].toLowerCase() !== "webnovels"
-      || !SLUG_PATTERN.test(segments[1])
-      || !/^lecture\.html$/i.test(segments[2])) {
-      throw new Error("NovelNeko identifier is not a chapter URL.");
-    }
-    const number = Number(url.searchParams.get("chapitre"));
-    if (!Number.isInteger(number) || number < 1 || number > 100000) {
-      throw new Error("NovelNeko chapter number is invalid.");
-    }
-    const slug = segments[1];
-    return { slug, number, href: chapterURL(slug, number) };
   }
 
   function isChallengePage(body) {
@@ -227,9 +166,9 @@
   }
 
   async function requestURL(url, headers, responseClass) {
-    if (typeof globalThis.fetchv2 !== "function") throw new Error("NovelNeko requires the fetchv2 bridge.");
+    if (typeof globalThis.fetchv2 !== "function") throw new Error("Novel Neko Light requires the fetchv2 bridge.");
     const requestURLValue = absoluteURL(url);
-    if (!requestURLValue) throw new Error("NovelNeko request URL is not public or host-confined.");
+    if (!requestURLValue) throw new Error("Novel Neko Light request URL is not public or host-confined.");
     let lastError = null;
     for (let attempt = 1; attempt <= 3; attempt += 1) {
       if (attempt > 1) await sleep(700 * (attempt - 1));
@@ -242,42 +181,42 @@
           { followRedirects: true, maxBytesHint: MAX_RESPONSE_BYTES, responseClass },
         );
         const status = Number(response && response.status);
-        if (!response || response.bodyDropped) throw new Error("NovelNeko response exceeded the module limit.");
+        if (!response || response.bodyDropped) throw new Error("Novel Neko Light response exceeded the module limit.");
         const finalURL = response.finalUrl || response.url;
         if (finalURL && !absoluteURL(finalURL)) {
-          throw new Error("NovelNeko redirected to a non-public or unapproved host.");
+          throw new Error("Novel Neko Light redirected to a non-public or unapproved host.");
         }
         if (response.ok === false || (status && (status < 200 || status >= 300))) {
-          lastError = new Error(`NovelNeko request failed with HTTP ${status || "error"}.`);
+          lastError = new Error(`Novel Neko Light request failed with HTTP ${status || "error"}.`);
           if (!RETRYABLE_STATUS.has(status)) break;
           continue;
         }
         const body = await responseBody(response);
-        if (!body) throw new Error("NovelNeko returned an empty response.");
-        if (isChallengePage(body)) throw new Error("NovelNeko returned a browser challenge.");
+        if (!body) throw new Error("Novel Neko Light returned an empty response.");
+        if (isChallengePage(body)) throw new Error("Novel Neko Light returned a browser challenge.");
         return body;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         if (/challenge|exceeded the module limit/i.test(lastError.message)) break;
       }
     }
-    throw lastError || new Error("NovelNeko request failed.");
+    throw lastError || new Error("Novel Neko Light request failed.");
   }
 
   async function requestHTML(url) {
     const body = await requestURL(url, DEFAULT_HEADERS, "html");
-    if (typeof body !== "string" || !body) throw new Error("NovelNeko returned a malformed page.");
+    if (typeof body !== "string" || !body) throw new Error("Novel Neko Light returned a malformed page.");
     return body;
   }
 
   async function requestCatalogueJSON() {
     const body = await requestURL(CATALOG_URL, JSON_HEADERS, "json");
     if (typeof body === "object" && body !== null) return body;
-    if (typeof body !== "string" || !body) throw new Error("NovelNeko returned a malformed catalogue.");
+    if (typeof body !== "string" || !body) throw new Error("Novel Neko Light returned a malformed catalogue.");
     try {
       return JSON.parse(body);
     } catch (_) {
-      throw new Error("NovelNeko returned malformed JSON.");
+      throw new Error("Novel Neko Light returned malformed JSON.");
     }
   }
 
@@ -290,20 +229,24 @@
     if (hasUnsafeMarker(rawTitle)) return null;
     const rawLink = String(entry.link || "").trim();
     if (!rawLink) return null;
+    const href = absoluteURL(rawLink, `${BASE_URL}/lightnovels/`);
+    if (!href) return null;
     let slug = "";
     try {
-      const href = absoluteURL(rawLink, `${BASE_URL}/webnovels/`);
-      if (!href) return null;
-      slug = normalizeNovelSlug(href);
+      const url = new URL(href);
+      const segments = url.pathname.split("/").filter(Boolean);
+      if (segments.length < 2 || segments[0].toLowerCase() !== "lightnovels") return null;
+      if (!SLUG_PATTERN.test(segments[1])) return null;
+      slug = segments[1];
     } catch (_) {
       return null;
     }
-    const href = `${BASE_URL}/webnovels/${slug}/`;
-    const image = absoluteURL(String(entry.image || "").trim(), `${BASE_URL}/webnovels/`) || "";
+    const page = `${BASE_URL}/lightnovels/${slug}/`;
+    const image = absoluteURL(String(entry.image || "").trim(), `${BASE_URL}/lightnovels/`) || "";
     return {
       id: slug,
-      href,
-      url: href,
+      href: page,
+      url: page,
       title: rawTitle,
       image,
       cover: image,
@@ -318,7 +261,7 @@
   async function loadCatalogue() {
     if (catalogueCache.data) return catalogueCache.data;
     const parsed = await requestCatalogueJSON();
-    if (!Array.isArray(parsed)) throw new Error("NovelNeko catalogue is malformed.");
+    if (!Array.isArray(parsed)) throw new Error("Novel Neko Light catalogue is malformed.");
     const seen = new Set();
     const items = [];
     for (const entry of parsed) {
@@ -336,13 +279,13 @@
     // zero and a crash here would take down the whole Discover screen.
     const requestedPage = Math.max(1, Number(page) || 1);
     if (!Object.prototype.hasOwnProperty.call(FEEDS, feed)) {
-      throw new Error("NovelNeko discovery feed is unknown.");
+      throw new Error("Novel Neko Light discovery feed is unknown.");
     }
     // The catalogue lives in a single JSON index; only page 1 carries items.
     if (requestedPage !== 1) return { items: [], hasMore: false };
     // Browsing must never crash the source screen: any fetch or parse
     // failure degrades to an empty list. Challenge, login and malformed
-    // content on detail/chapter paths still fail closed elsewhere.
+    // content on detail/resource paths still fail closed elsewhere.
     try {
       return { items: await loadCatalogue(), hasMore: false };
     } catch (_) {
@@ -360,10 +303,10 @@
 
   async function discoveryHome() {
     try {
-      const catalogue = await safeFeed("webnovels", 1);
+      const catalogue = await safeFeed("lightnovels", 1);
       return {
         sections: [
-          { id: "webnovels", title: FEEDS.webnovels, items: catalogue.items },
+          { id: "lightnovels", title: FEEDS.lightnovels, items: catalogue.items },
         ],
       };
     } catch (_) {
@@ -406,14 +349,19 @@
     }
   }
 
-  function sideInfo(html, label) {
+  function sideInfo(html, labels) {
     // Side panel rows render as "<div><strong>Label :</strong> value</div>".
-    const pattern = new RegExp(
-      `<div>\\s*<strong>\\s*${label}\\s*:?\\s*<\\/strong>\\s*([^<]*)<\\/div>`,
-      "i",
-    );
-    const match = String(html || "").match(pattern);
-    return match ? cleanText(match[1]) : "";
+    // Light-novel pages use English labels ("Status :").
+    const names = Array.isArray(labels) ? labels : [labels];
+    for (const label of names) {
+      const pattern = new RegExp(
+        `<div>\\s*<strong>\\s*${label}\\s*:?\\s*<\\/strong>\\s*([^<]*)<\\/div>`,
+        "i",
+      );
+      const match = String(html || "").match(pattern);
+      if (match && cleanText(match[1])) return cleanText(match[1]);
+    }
+    return "";
   }
 
   function parseGenres(html) {
@@ -429,48 +377,74 @@
     return [...new Set(genres)];
   }
 
-  function parseChapterCount(html) {
-    // Primary: the reader script embeds the exact chapter count...
-    const embedded = String(html || "").match(/const\s+maxChapitres\s*=\s*(\d+)\s*;/i);
-    if (embedded) {
-      const count = Number(embedded[1]);
-      if (Number.isInteger(count) && count >= 1 && count <= 100000) return count;
-    }
-    // Fallback 1: the "285 chapitres" badge next to the title...
-    const badge = String(html || "").match(/<div class="chapter-count">\s*(\d+)\s+chapitres?\s*<\/div>/i);
-    if (badge) {
-      const count = Number(badge[1]);
-      if (Number.isInteger(count) && count >= 1 && count <= 100000) return count;
-    }
-    // Fallback 2: the "Dernier chapitre" button (?chapitre=N).
-    const last = String(html || "").match(/lecture\.html\?chapitre=(\d+)/gi);
-    if (last && last.length > 0) {
-      let best = 0;
-      for (const link of last) {
-        const count = Number(link.match(/(\d+)$/)[1]);
-        if (Number.isInteger(count) && count > best && count <= 100000) best = count;
+  function parseVolumes(html, pageURL) {
+    // Light-novel volumes are direct download links (volumes/tomeN.pdf,
+    // volumes/tomeN.epub). Only links actually present in the page are
+    // returned: formats are never guessed. "First/last" buttons duplicate the
+    // "Tome N" rows, so links are deduplicated by URL, keeping "Tome N".
+    const found = new Map();
+    const pattern = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    while ((match = pattern.exec(String(html || ""))) !== null) {
+      const href = absoluteURL(decodeEntities(match[1]).trim(), pageURL);
+      if (!href) continue;
+      let pathname = "";
+      try {
+        pathname = new URL(href).pathname;
+      } catch (_) {
+        continue;
       }
-      if (best >= 1) return best;
+      if (!/\/volumes\//i.test(pathname)) continue;
+      const file = pathname.split("/").filter(Boolean).pop() || "";
+      const extension = file.match(/\.([A-Za-z0-9]+)$/);
+      if (!extension) continue;
+      const format = extension[1].toLowerCase();
+      if (format !== "pdf" && format !== "epub") continue;
+      const label = cleanText(match[2]);
+      const existing = found.get(href);
+      const isTomeLabel = (text) => /^tome\s+\d/i.test(String(text || ""));
+      if (!existing) {
+        found.set(href, { url: href, format, label });
+      } else if (!isTomeLabel(existing.label) && isTomeLabel(label)) {
+        found.set(href, { url: href, format, label });
+      } else if (!existing.label && label) {
+        found.set(href, { url: href, format, label });
+      }
     }
-    return 0;
+    // Reading order is oldest-first. The page mixes "first/last" buttons
+    // ahead of a newest-first list, so entries are sorted by volume number
+    // (stable for several formats of the same tome) instead of reversing.
+    const entries = [...found.values()].map((entry, order) => ({ ...entry, order }));
+    entries.sort((a, b) => (volumeOrder(a) - volumeOrder(b)) || (a.order - b.order));
+    return entries.map(({ url, format, label }) => ({ url, format, label }));
+  }
+
+  function volumeOrder(volume) {
+    const source = `${volume.label} ${String(volume.url).split("/").filter(Boolean).pop() || ""}`;
+    const parsed = source.match(/tome\s*(\d+(?:[.\-]\d+)?)/i);
+    if (parsed) {
+      const number = Number(parsed[1].replace("-", "."));
+      if (Number.isFinite(number) && number >= 0 && number <= 100000) return number;
+    }
+    return Number.POSITIVE_INFINITY;
   }
 
   async function extractDetails(id) {
     const slug = normalizeNovelSlug(id);
     const cacheKey = slug.toLowerCase();
     if (detailsCache.has(cacheKey)) return detailsCache.get(cacheKey);
-    const pageURL = novelPageURL(id);
+    const pageURL = novelPageURL(slug);
     const html = await requestHTML(pageURL);
     const rawTitle = cleanText((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || "");
-    if (!rawTitle) throw new Error("NovelNeko title is empty after cleaning.");
+    if (!rawTitle) throw new Error("Novel Neko Light title is empty after cleaning.");
     const genres = parseGenres(html);
     if ([rawTitle, ...genres].some(hasUnsafeMarker)) {
-      throw new Error("NovelNeko title failed the safety filter.");
+      throw new Error("Novel Neko Light title failed the safety filter.");
     }
-    const rawStatus = sideInfo(html, "Statut");
+    const rawStatus = sideInfo(html, ["Status", "Statut"]);
     const status = STATUS_MAP[rawStatus.toLowerCase()] || rawStatus;
-    const author = sideInfo(html, "Auteur");
-    const translator = sideInfo(html, "Traducteur");
+    const author = sideInfo(html, ["Auteur", "Author"]);
+    const translator = sideInfo(html, ["Traducteur", "Translator"]);
     let description = "";
     const synopsis = html.match(/<div class="synopsis-box">([\s\S]*?)<\/div>/i);
     if (synopsis) description = cleanText(synopsis[1]).replace(/^Synopsis\s*:?\s*/i, "");
@@ -498,52 +472,29 @@
     return details;
   }
 
-  async function extractChapters(id) {
+  async function extractResources(id) {
     const slug = normalizeNovelSlug(id);
     const cacheKey = slug.toLowerCase();
-    if (chaptersCache.has(cacheKey)) return chaptersCache.get(cacheKey);
-    await extractDetails(id);
-    const html = await requestHTML(novelPageURL(id));
-    const count = parseChapterCount(html);
-    if (!count) throw new Error("NovelNeko returned no chapter list.");
-    // Chapters are numbered 1..N and rendered oldest-first in reading
-    // order; the detail page lists them newest-first for display only.
-    const output = [];
-    for (let number = 1; number <= count; number += 1) {
-      const href = chapterURL(slug, number);
-      output.push({
-        id: href,
-        href,
-        url: href,
-        number,
-        title: `Chapitre ${number}`,
-        language: "fr",
-      });
-    }
-    chaptersCache.set(cacheKey, output);
-    return output;
+    if (resourcesCache.has(cacheKey)) return resourcesCache.get(cacheKey);
+    const details = await extractDetails(id);
+    const pageURL = novelPageURL(slug);
+    const html = await requestHTML(pageURL);
+    // File bodies are never fetched here: the app downloads them. Only the
+    // links observed on the novel page are returned, oldest volume first.
+    const resources = parseVolumes(html, pageURL).map((volume) => {
+      const label = volume.label || "Tome";
+      return {
+        format: volume.format,
+        url: volume.url,
+        fileName: `${details.title} - ${label}.${volume.format}`,
+        headers: { Referer: pageURL },
+      };
+    });
+    resourcesCache.set(cacheKey, resources);
+    return resources;
   }
 
-  async function extractText(reference) {
-    const ref = normalizeChapterReference(reference);
-    await extractDetails(ref.slug);
-    const raw = await requestURL(chapterTextURL(ref.slug, ref.number), TEXT_HEADERS, "html");
-    if (typeof raw !== "string" || !raw) throw new Error("NovelNeko chapter text is unavailable.");
-    const body = raw;
-    if (/<\s*html[\s>]/i.test(body.slice(0, 4096))) {
-      throw new Error("NovelNeko chapter text is unavailable.");
-    }
-    const content = String(body).replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
-    if (!content || content.length < MIN_TEXT_CHARS) {
-      throw new Error("NovelNeko chapter text is unavailable.");
-    }
-    if (new TextEncoder().encode(content).byteLength > MAX_TEXT_BYTES) {
-      throw new Error("NovelNeko chapter text exceeds the app size limit.");
-    }
-    return content;
-  }
-
-  const handlers = { searchResults, extractDetails, extractChapters, extractText, discoveryHome, discoveryFeed };
+  const handlers = { searchResults, extractDetails, extractResources, discoveryHome, discoveryFeed };
   globalThis.SynthetiqModule = handlers;
   Object.assign(globalThis, handlers);
 })();

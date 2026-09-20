@@ -44,18 +44,37 @@
       "id": "novelneko-v1",
       "familyID": "novelneko-v1",
       "name": "Novel Neko",
-      "version": "0.2.0",
+      "version": "0.3.0",
+      "language": "fr",
+      "contentType": "text",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/novelneko/manifest.json",
+        "sha256": "95ec7e99095fe966037a4c231c0060f5cc2cfd455d02f168c1c1454bff0fbe01"
+      },
+      "icon": {
+        "path": "modules/novelneko/icon.png",
+        "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
+      }
+    },
+    {
+      "id": "novelneko-light-v1",
+      "familyID": "novelneko-light-v1",
+      "name": "Novel Neko Light",
+      "version": "0.1.0",
       "language": "fr",
       "contentType": "publication",
       "contentRating": "suggestive",
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/novelneko/manifest.json",
-        "sha256": "ebb99d90d5e485f5847c3a068548610362de8f35da7c03eb4601cbf9cc1d13d6"
+        "path": "modules/novelneko-light/manifest.json",
+        "sha256": "e913a132faa83621a23a5388e9279a0799daf22d5c54f5ddbce47002a2c3e7be"
       },
       "icon": {
-        "path": "modules/novelneko/icon.png",
+        "path": "modules/novelneko-light/icon.png",
         "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
       }
     }

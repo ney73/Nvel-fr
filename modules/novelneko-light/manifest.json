@@ -10,23 +10,22 @@
   "capabilities": [
     "search",
     "details",
-    "chapters",
-    "text",
+    "resources",
     "discovery"
   ],
   "contentRating": "suggestive",
-  "contentType": "text",
+  "contentType": "publication",
   "contractVersion": 1,
   "entry": {
-    "path": "modules/novelneko/index.js",
-    "sha256": "e1672b20841209c8f7295e6dafddb7d8df4102b15fed6946835ff446f81a7680"
+    "path": "modules/novelneko-light/index.js",
+    "sha256": "5afbaa51f48f97264916eb329f6040dfdfda473527e07656d178c7264ca32e90"
   },
-  "familyID": "novelneko-v1",
+  "familyID": "novelneko-light-v1",
   "icon": {
-    "path": "modules/novelneko/icon.png",
+    "path": "modules/novelneko-light/icon.png",
     "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
   },
-  "id": "novelneko-v1",
+  "id": "novelneko-light-v1",
   "language": "fr",
   "legacyIDs": [],
   "limits": {
@@ -37,9 +36,9 @@
     "timeoutMilliseconds": 30000
   },
   "minimumAppVersion": "1.0.0",
-  "name": "Novel Neko",
+  "name": "Novel Neko Light",
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelneko.fr",
-  "version": "0.3.0"
+  "version": "0.1.0"
 }
