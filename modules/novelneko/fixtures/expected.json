@@ -1,0 +1,98 @@
+{
+  "discovery": {
+    "sections": [
+      {
+        "id": "webnovels",
+        "title": "Web-Novels",
+        "items": [
+          {
+            "id": "fixture-aurore",
+            "href": "https://novelneko.fr/webnovels/fixture-aurore/",
+            "url": "https://novelneko.fr/webnovels/fixture-aurore/",
+            "title": "Fixture Aurore",
+            "image": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+            "cover": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          },
+          {
+            "id": "fixture-brume",
+            "href": "https://novelneko.fr/webnovels/fixture-brume/",
+            "url": "https://novelneko.fr/webnovels/fixture-brume/",
+            "title": "Fixture Brume",
+            "image": "https://novelneko.fr/webnovels/fixture-brume/cover.jpg",
+            "cover": "https://novelneko.fr/webnovels/fixture-brume/cover.jpg",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          }
+        ]
+      }
+    ]
+  },
+  "search": {
+    "items": [
+      {
+        "id": "fixture-aurore",
+        "href": "https://novelneko.fr/webnovels/fixture-aurore/",
+        "url": "https://novelneko.fr/webnovels/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "image": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+        "cover": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+        "author": "",
+        "authors": [],
+        "genres": [],
+        "status": "",
+        "language": "fr"
+      }
+    ],
+    "hasMore": false
+  },
+  "details": {
+    "id": "fixture-aurore",
+    "href": "https://novelneko.fr/webnovels/fixture-aurore/",
+    "url": "https://novelneko.fr/webnovels/fixture-aurore/",
+    "title": "Fixture Aurore",
+    "description": "Fixture Aurore raconte l'histoire inventée d'une jeune cartographe qui dessine des îles que personne n'a jamais vues. Un matin, l'une de ses cartes se met à briller, et le phare du village s'éteint.",
+    "image": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+    "cover": "https://novelneko.fr/webnovels/fixture-aurore/cover.jpg",
+    "author": "Auteur Fictif",
+    "authors": ["Auteur Fictif"],
+    "translator": "Traducteur Fictif",
+    "genres": ["Aventure", "Fantasy"],
+    "status": "Ongoing",
+    "language": "fr"
+  },
+  "chapters": [
+    {
+      "id": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
+      "href": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
+      "url": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=1",
+      "number": 1,
+      "title": "Chapitre 1",
+      "language": "fr"
+    },
+    {
+      "id": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=2",
+      "href": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=2",
+      "url": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=2",
+      "number": 2,
+      "title": "Chapitre 2",
+      "language": "fr"
+    },
+    {
+      "id": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=3",
+      "href": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=3",
+      "url": "https://novelneko.fr/webnovels/fixture-aurore/lecture.html?chapitre=3",
+      "number": 3,
+      "title": "Chapitre 3",
+      "language": "fr"
+    }
+  ],
+  "text": "Chapitre 1\n====================\n\nL'aube se levait sur le port inventé de Clairval, et la cartographe Lina rangeait déjà ses compas dans leur écrin de bois clair.\n\nElle avait passé la nuit à redessiner la baie, car la marée basse révélait un banc de sable en forme d'étoile que personne n'avait remarqué avant elle.\n\n« Une carte n'est jamais finie, disait son grand-père. Elle attend seulement que quelqu'un la regarde vraiment. »\n\nLina sourit, trempa sa plume dans l'encre bleue, et traça la première ligne de sa plus grande aventure."
+}

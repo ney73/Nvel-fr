@@ -39,6 +39,25 @@
         "path": "modules/noveldelaube/icon.png",
         "sha256": "7e327d1dfc62b2caa1b950a9efe245841e810264d39c51b5ba209edc87b7e427"
       }
+    },
+    {
+      "id": "novelneko-v1",
+      "familyID": "novelneko-v1",
+      "name": "Novel Neko",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "text",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/novelneko/manifest.json",
+        "sha256": "3be66908cc961edc07334a6261b0d353b4a044b92d3e2dd8de9cb077e253023a"
+      },
+      "icon": {
+        "path": "modules/novelneko/icon.png",
+        "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
+      }
     }
   ],
   "repository": {

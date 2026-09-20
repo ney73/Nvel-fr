@@ -1,0 +1,31 @@
+[
+  {
+    "title": "Fixture Aurore",
+    "image": "fixture-aurore/cover.jpg",
+    "link": "fixture-aurore/",
+    "subtitle": "3 chapitres"
+  },
+  {
+    "title": "Fixture Brume",
+    "image": "fixture-brume/cover.jpg",
+    "link": "fixture-brume/",
+    "subtitle": "2 chapitres"
+  },
+  {
+    "title": "Fixture Aurore",
+    "image": "fixture-aurore/cover.jpg",
+    "link": "fixture-aurore/",
+    "subtitle": "3 chapitres"
+  },
+  {
+    "title": "Smut Interdit",
+    "image": "smut-interdit/cover.jpg",
+    "link": "smut-interdit/",
+    "subtitle": "1 chapitre"
+  },
+  {
+    "image": "sans-titre/cover.jpg",
+    "link": "sans-titre/",
+    "subtitle": "1 chapitre"
+  }
+]
