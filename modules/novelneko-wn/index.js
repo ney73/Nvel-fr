@@ -1,6 +1,7 @@
 "use strict";
 
-// NovelNeko (https://novelneko.fr) — French fan-translation reader module.
+// Novel Neko Web Novel (https://novelneko.fr) — French fan-translation text
+// reader module.
 //
 // Scope: the Web-Novels catalogue only. Catalogue entries live in the static
 // JSON index /webnovels/webnovel.json, each novel page

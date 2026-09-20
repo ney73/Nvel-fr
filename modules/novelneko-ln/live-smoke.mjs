@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 async function loadModule() {
-  const source = await readFile(path.join(root, "modules", "novelneko-light", "index.js"), "utf8");
+  const source = await readFile(path.join(root, "modules", "novelneko-ln", "index.js"), "utf8");
   const fetchv2 = async (url, headers = {}, method = "GET", body = null, options = {}) => {
     const response = await fetch(url, {
       method,
@@ -35,7 +35,7 @@ async function loadModule() {
   };
   const context = vm.createContext({ URL, URLSearchParams, TextDecoder, TextEncoder, console, setTimeout, clearTimeout, fetchv2 });
   context.globalThis = context;
-  new vm.Script(source, { filename: "modules/novelneko-light/index.js" }).runInContext(context);
+  new vm.Script(source, { filename: "modules/novelneko-ln/index.js" }).runInContext(context);
   return context.SynthetiqModule;
 }
 
@@ -53,7 +53,7 @@ for (const resource of resources) {
   assert.match(resource.url, /^https:\/\/novelneko\.fr\/lightnovels\//);
 }
 console.log(JSON.stringify({
-  source: "Novel Neko Light",
+  source: "Novel Neko Light Novel",
   title: details.title,
   catalogueItems: home.sections[0].items.length,
   searchItems: search.items.length,

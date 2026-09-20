@@ -17,17 +17,19 @@
   "contentType": "publication",
   "contractVersion": 1,
   "entry": {
-    "path": "modules/novelneko-light/index.js",
-    "sha256": "5afbaa51f48f97264916eb329f6040dfdfda473527e07656d178c7264ca32e90"
+    "path": "modules/novelneko-ln/index.js",
+    "sha256": "5ad4f33e2b3d44b7d99ab25bb4adf4a1fa42cfcb38fbc5e074a040bb0975cb28"
   },
-  "familyID": "novelneko-light-v1",
+  "familyID": "novelneko-ln",
   "icon": {
-    "path": "modules/novelneko-light/icon.png",
+    "path": "modules/novelneko-ln/icon.png",
     "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
   },
-  "id": "novelneko-light-v1",
+  "id": "novelneko-ln",
   "language": "fr",
-  "legacyIDs": [],
+  "legacyIDs": [
+    "novelneko-light-v1"
+  ],
   "limits": {
     "cacheTTLSeconds": 900,
     "maxConcurrentRequests": 2,
@@ -36,7 +38,7 @@
     "timeoutMilliseconds": 30000
   },
   "minimumAppVersion": "1.0.0",
-  "name": "Novel Neko Light",
+  "name": "Novel Neko Light Novel",
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelneko.fr",

@@ -41,28 +41,28 @@
       }
     },
     {
-      "id": "novelneko-v1",
-      "familyID": "novelneko-v1",
-      "name": "Novel Neko",
-      "version": "0.3.0",
+      "id": "novelneko-wn",
+      "familyID": "novelneko-wn",
+      "name": "Novel Neko Web Novel",
+      "version": "0.1.0",
       "language": "fr",
       "contentType": "text",
       "contentRating": "suggestive",
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/novelneko/manifest.json",
-        "sha256": "95ec7e99095fe966037a4c231c0060f5cc2cfd455d02f168c1c1454bff0fbe01"
+        "path": "modules/novelneko-wn/manifest.json",
+        "sha256": "1beafab334fffa92eca251a44351683aa2e6b925473ed97634b6b96e1afd09a6"
       },
       "icon": {
-        "path": "modules/novelneko/icon.png",
+        "path": "modules/novelneko-wn/icon.png",
         "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
       }
     },
     {
-      "id": "novelneko-light-v1",
-      "familyID": "novelneko-light-v1",
-      "name": "Novel Neko Light",
+      "id": "novelneko-ln",
+      "familyID": "novelneko-ln",
+      "name": "Novel Neko Light Novel",
       "version": "0.1.0",
       "language": "fr",
       "contentType": "publication",
@@ -70,11 +70,11 @@
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/novelneko-light/manifest.json",
-        "sha256": "e913a132faa83621a23a5388e9279a0799daf22d5c54f5ddbce47002a2c3e7be"
+        "path": "modules/novelneko-ln/manifest.json",
+        "sha256": "5badc9cee4a0f15646cd27c5ee405383c60b1f368f82d0b43defcd81a5813b09"
       },
       "icon": {
-        "path": "modules/novelneko-light/icon.png",
+        "path": "modules/novelneko-ln/icon.png",
         "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
       }
     }

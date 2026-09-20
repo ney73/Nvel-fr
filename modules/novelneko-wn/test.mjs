@@ -196,9 +196,9 @@ test("NovelNeko manifest pins the entry and a valid neutral PNG icon", async () 
   const icon = await readFile(path.join(root, "icon.png"));
   const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
-  assert.equal(manifest.entry.path, "modules/novelneko/index.js");
+  assert.equal(manifest.entry.path, "modules/novelneko-wn/index.js");
   assert.equal(manifest.entry.sha256, sha256(entry));
-  assert.equal(manifest.icon.path, "modules/novelneko/icon.png");
+  assert.equal(manifest.icon.path, "modules/novelneko-wn/icon.png");
   assert.equal(manifest.icon.sha256, sha256(icon));
   assert.deepEqual(Array.from(icon.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
   assert.equal(icon.readUInt32BE(16), 128);

@@ -1,11 +1,12 @@
 "use strict";
 
-// Novel Neko Light (https://novelneko.fr) — French fan-translation publication
-// module for the Light-Novels catalogue: downloadable PDF/EPUB volumes linked
-// as volumes/tomeN.pdf from each novel page. Catalogue entries live in the
-// static JSON index /lightnovels/lightnovel.json. Web novels (online text
-// chapters) are served by the sibling novelneko-v1 text module: one module
-// serves one terminal path, so both formats work instead of competing.
+// Novel Neko Light Novel (https://novelneko.fr) — French fan-translation
+// publication module for the Light-Novels catalogue: downloadable PDF/EPUB
+// volumes linked as volumes/tomeN.pdf from each novel page. Catalogue entries
+// live in the static JSON index /lightnovels/lightnovel.json. Web novels
+// (online text chapters) are served by the sibling novelneko-wn text module:
+// one module serves one terminal path, so both formats work instead of
+// competing.
 (() => {
   const BASE_URL = "https://novelneko.fr";
   const CATALOG_URL = `${BASE_URL}/lightnovels/lightnovel.json`;

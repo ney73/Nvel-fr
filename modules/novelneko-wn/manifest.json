@@ -18,17 +18,19 @@
   "contentType": "text",
   "contractVersion": 1,
   "entry": {
-    "path": "modules/novelneko/index.js",
-    "sha256": "e1672b20841209c8f7295e6dafddb7d8df4102b15fed6946835ff446f81a7680"
+    "path": "modules/novelneko-wn/index.js",
+    "sha256": "245462f4a85edfdedf25efad6dc8239830429959296baa8ae65bf523d8c5ad9f"
   },
-  "familyID": "novelneko-v1",
+  "familyID": "novelneko-wn",
   "icon": {
-    "path": "modules/novelneko/icon.png",
+    "path": "modules/novelneko-wn/icon.png",
     "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
   },
-  "id": "novelneko-v1",
+  "id": "novelneko-wn",
   "language": "fr",
-  "legacyIDs": [],
+  "legacyIDs": [
+    "novelneko-v1"
+  ],
   "limits": {
     "cacheTTLSeconds": 900,
     "maxConcurrentRequests": 2,
@@ -37,9 +39,9 @@
     "timeoutMilliseconds": 30000
   },
   "minimumAppVersion": "1.0.0",
-  "name": "Novel Neko",
+  "name": "Novel Neko Web Novel",
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelneko.fr",
-  "version": "0.3.0"
+  "version": "0.1.0"
 }
