@@ -5,7 +5,7 @@
       "id": "ney73.nvl-fr",
       "familyID": "novelfrance",
       "name": "NovelFrance",
-      "version": "0.4.2",
+      "version": "0.5.0",
       "language": "fr",
       "contentType": "text",
       "contentRating": "unknown",
@@ -14,7 +14,7 @@
       "sortPriority": 98,
       "manifest": {
         "path": "modules/novelfrance/manifest.json",
-        "sha256": "3af894b00947fb26cd9047582f3a83de1956b5f1c568fb40956e6f924f4a956f"
+        "sha256": "1ce96f1560de9b7cea0884f1aa798d70eb2c71e5d546583fb64ef456a11594e2"
       },
       "icon": {
         "path": "modules/novelfrance/icon.png",
