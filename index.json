@@ -14,11 +14,11 @@
       "sortPriority": 98,
       "manifest": {
         "path": "modules/novelfrance/manifest.json",
-        "sha256": "188b3219cee1b4da8e37ea4f80c47be8682c7fb71a6e31574bce0a4c8650f6af"
+        "sha256": "516472290733a571cf8eed75f1e03a2d87ab6f7bdede23da058939790ed941ae"
       },
       "icon": {
         "path": "modules/novelfrance/icon.png",
-        "sha256": "7430c04b3aaa06a57cab6d1fab557638161f5396c27beaa3331c4029ff149e06"
+        "sha256": "ea9c480482fe23f4c8cb216c0d7df1664b77daca685b39ae817d57040b392a3f"
       }
     },
     {
