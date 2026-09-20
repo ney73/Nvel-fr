@@ -44,7 +44,7 @@
       "id": "novelneko-wn",
       "familyID": "novelneko-wn",
       "name": "Novel Neko Web Novel",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "language": "fr",
       "contentType": "text",
       "contentRating": "suggestive",
@@ -52,7 +52,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/novelneko-wn/manifest.json",
-        "sha256": "1beafab334fffa92eca251a44351683aa2e6b925473ed97634b6b96e1afd09a6"
+        "sha256": "e160e340ed267c821489b87d3b73166c294dff51febc076a0b8471fc1dabfb41"
       },
       "icon": {
         "path": "modules/novelneko-wn/icon.png",

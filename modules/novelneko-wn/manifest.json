@@ -19,7 +19,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/novelneko-wn/index.js",
-    "sha256": "245462f4a85edfdedf25efad6dc8239830429959296baa8ae65bf523d8c5ad9f"
+    "sha256": "58848ceca1da923f0c71df0673409fce0dfde2aa9b8b022f487d779af31f7321"
   },
   "familyID": "novelneko-wn",
   "icon": {
@@ -43,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://novelneko.fr",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

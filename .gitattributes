@@ -1,0 +1,4 @@
+# Lock line endings to LF so SHA-256 hashes computed locally always match
+# the bytes served by GitHub. Windows checkouts must not introduce CRLF.
+* text=auto eol=lf
+*.png binary
