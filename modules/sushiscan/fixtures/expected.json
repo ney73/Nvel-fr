@@ -1,8 +1,0 @@
-{
-  "discoveryBlocked": {
-    "sections": [
-      { "id": "browse", "title": "Catalogue", "items": [] }
-    ]
-  },
-  "emptyList": { "items": [], "hasMore": false }
-}

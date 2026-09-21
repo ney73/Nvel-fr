@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "finalize": "node scripts/finalize-hashes.mjs",
-    "test": "node --test modules/novelfrance/test.mjs modules/noveldelaube/test.mjs modules/novelneko-wn/test.mjs modules/novelneko-ln/test.mjs modules/sushiscan/test.mjs tests/documentation.test.mjs && node scripts/source-contract-audit.mjs && node scripts/validate.mjs && node scripts/verify-repository.mjs",
+    "test": "node --test modules/novelfrance/test.mjs modules/noveldelaube/test.mjs modules/novelneko-wn/test.mjs modules/novelneko-ln/test.mjs tests/documentation.test.mjs && node scripts/source-contract-audit.mjs && node scripts/validate.mjs && node scripts/verify-repository.mjs",
     "test:contracts": "node --test tests/chapter-ownership.test.mjs && node scripts/source-contract-audit.mjs",
     "test:live": "RUN_LIVE_TESTS=1 node scripts/live-smoke.mjs",
     "test:novel-sources:live": "node scripts/live-novel-sources-proof.mjs",
