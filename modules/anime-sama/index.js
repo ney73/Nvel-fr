@@ -2,13 +2,14 @@
 
 // Anime Sama Manga (https://anime-sama.to) — French scan reader module.
 //
-// Scope: the Scans catalogue only (VF scan cards on the homepage linking to
-// /catalogue/<slug>/scan/vf/). The anime streaming section (video embeds)
-// is out of scope for this pageImages-type module.
-// Observed data flow (2026-09-21):
-// - catalogue cards: <a href="/catalogue/<slug>/scan/vf/"> with a card-title
-//   and a cdn.jsdelivr.net cover;
-// - series page: #titreOeuvre (display title), #imgOeuvre (cover),
+// Scope: the Scans catalogue only (VF scan works). The anime streaming
+// section (video embeds) is out of scope for this pageImages-type module.
+// Observed data flow:
+// - discovery unions two bounded pages: homepage scan cards linking
+//   /catalogue/<slug>/scan/vf/ (proven scans) and the /catalogue/ page cards
+//   linking /catalogue/<slug> (every work; scan availability is confirmed
+//   lazily when its scan page is opened, avoiding a per-work crawl);
+// - series scan page: #titreOeuvre (display title), #imgOeuvre (cover),
 //   #avOeuvre (status line);
 // - chapters: /s2/scans/get_nb_chap_et_img.php?oeuvre=<DisplayTitle> returns
 //   {"1":<pages>,"2":<pages>,...};
@@ -249,45 +250,74 @@
   }
 
   function parseCatalogueCards(html) {
-    // Scan cards link /catalogue/<slug>/scan/vf/ and carry a card-title plus
-    // a jsDelivr cover. Anime cards (saison/vostfr/...) are excluded.
+    // Homepage scan cards link /catalogue/<slug>/scan/vf/ and carry a
+    // card-title plus a jsDelivr cover. Anime cards (saison/vostfr/...)
+    // are excluded here; the /catalogue/ page covers every work below.
     const items = [];
     const seen = new Set();
     const pattern = /<a\b[^>]*href="(\/catalogue\/[A-Za-z0-9_.~-]+\/scan\/vf\/?)"[^>]*>([\s\S]*?)<\/a>/gi;
     let match;
     while ((match = pattern.exec(String(html || ""))) !== null) {
-      const href = absoluteURL(match[1]);
-      if (!href) continue;
-      const block = match[2];
-      let slug = "";
-      try {
-        const segments = new URL(href).pathname.split("/").filter(Boolean);
-        if (segments.length >= 2 && segments[0].toLowerCase() === "catalogue") slug = segments[1];
-      } catch (_) {
-        continue;
-      }
-      if (!slug || !SLUG_PATTERN.test(slug) || seen.has(slug)) continue;
-      const titleMatch = block.match(/card-title[^>]*>([^<]+)</i);
-      if (!titleMatch) continue;
-      const rawTitle = cleanText(titleMatch[1]);
-      if (!rawTitle || hasUnsafeMarker(rawTitle)) continue;
-      const imgMatch = block.match(/<img\b[^>]*(?:src|data-src|data-lazy-src)="([^"]+)"[^>]*>/i);
-      const image = imgMatch ? absoluteURL(decodeEntities(imgMatch[1]).trim(), BASE_URL) : "";
-      seen.add(slug);
-      const page = scanPageURL(slug);
-      items.push({
-        id: slug, href: page, url: page, title: rawTitle,
-        image, cover: image, author: "", authors: [],
-        genres: [], status: "", language: "fr",
-      });
+      const item = cardItem(match[1], match[2], seen);
+      if (item) items.push(item);
     }
     return items;
   }
 
+  function parseCatalogRoots(html, seen) {
+    // The /catalogue/ page lists every work with series-root links
+    // (/catalogue/<slug>) plus title, cover and synopsis. Scan availability
+    // is confirmed lazily at details time (see extractDetails).
+    const items = [];
+    const pattern = /<a\b[^>]*href="https?:\/\/anime-sama\.to\/catalogue\/([A-Za-z0-9_.~-]+)\/?"[^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    while ((match = pattern.exec(String(html || ""))) !== null) {
+      const item = cardItem(`/catalogue/${match[1]}/`, match[2], seen);
+      if (item) items.push(item);
+    }
+    return items;
+  }
+
+  function cardItem(path, block, seen) {
+    const href = absoluteURL(path);
+    if (!href) return null;
+    let slug = "";
+    try {
+      const segments = new URL(href).pathname.split("/").filter(Boolean);
+      if (segments.length < 2 || segments[0].toLowerCase() !== "catalogue") return null;
+      slug = segments[1];
+    } catch (_) {
+      return null;
+    }
+    if (!slug || !SLUG_PATTERN.test(slug) || seen.has(slug)) return null;
+    const titleMatch = block.match(/card-title[^>]*>([^<]+)</i);
+    if (!titleMatch) return null;
+    const rawTitle = cleanText(titleMatch[1]);
+    if (!rawTitle || hasUnsafeMarker(rawTitle)) return null;
+    const imgMatch = block.match(/<img\b[^>]*(?:src|data-src|data-lazy-src)="([^"]+)"[^>]*>/i);
+    const image = imgMatch ? absoluteURL(decodeEntities(imgMatch[1]).trim(), BASE_URL) : "";
+    seen.add(slug);
+    const page = scanPageURL(slug);
+    return {
+      id: slug, href: page, url: page, title: rawTitle,
+      image, cover: image, author: "", authors: [],
+      genres: [], status: "", language: "fr",
+    };
+  }
+
   async function loadCatalogue() {
     if (catalogueCache.data) return catalogueCache.data;
-    const html = await requestHTML(BASE_URL);
-    const items = parseCatalogueCards(html);
+    // Two bounded pages, fetched in parallel and merged by slug: homepage
+    // scan cards first, then catalogue-only works appended.
+    const [home, catalogue] = await Promise.all([
+      requestHTML(BASE_URL).catch(() => ""),
+      requestHTML(`${BASE_URL}/catalogue/`).catch(() => ""),
+    ]);
+    const seen = new Set();
+    const items = [...parseCatalogueCards(home)];
+    for (const item of items) seen.add(item.id);
+    for (const item of parseCatalogRoots(catalogue, seen)) items.push(item);
+    if (!home && !catalogue) throw new Error("Anime Sama catalogue is unavailable.");
     catalogueCache.data = items;
     return items;
   }
@@ -369,7 +399,17 @@
     const slug = normalizeSlug(id);
     if (detailsCache.has(slug)) return detailsCache.get(slug);
     const pageURL = scanPageURL(slug);
-    const html = await requestHTML(pageURL);
+    let html;
+    try {
+      html = await requestHTML(pageURL);
+    } catch (error) {
+      // Catalogue works without a scan version surface here as a clear
+      // exclusion instead of a generic fetch error.
+      if (/HTTP 404/i.test(error instanceof Error ? error.message : String(error))) {
+        throw new Error(`Anime Sama "${slug}" has no scan version.`);
+      }
+      throw error;
+    }
     const titleMatch = html.match(/<h3[^>]*id=["']titreOeuvre["'][^>]*>([\s\S]*?)<\/h3>/i);
     const rawTitle = cleanText(titleMatch ? titleMatch[1] : "");
     if (!rawTitle) throw new Error("Anime Sama title is empty after cleaning.");

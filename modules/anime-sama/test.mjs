@@ -36,9 +36,14 @@ function router(fixtures) {
     assert.equal(parsed.protocol, "https:");
     assert.ok(["anime-sama.to", "cdn.jsdelivr.net"].includes(parsed.hostname), `unapproved host ${parsed.hostname}`);
     if (url === "https://anime-sama.to/") return response(fixtures.catalogue);
+    if (url === "https://anime-sama.to/catalogue/") return response(fixtures.cataloguePage);
     if (url === "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/") return response(fixtures.series);
+    if (url === "https://anime-sama.to/catalogue/fixture-lueur/scan/vf/") return response(fixtures.seriesLueur);
+    if (url === "https://anime-sama.to/catalogue/fixture-anime/scan/vf/") return response("Not Found", 404);
     if (url.startsWith("https://anime-sama.to/s2/scans/get_nb_chap_et_img.php")) {
-      if (url.includes("Fixture%20Aurore")) return response(fixtures.chapters);
+      if (url.includes("Fixture%20Aurore") || url.includes("Fixture%20Lueur")) {
+        return response(fixtures.chapters);
+      }
       return response(fixtures.chaptersError);
     }
     throw new Error(`Unexpected URL: ${url}`);
@@ -48,7 +53,9 @@ function router(fixtures) {
 test("Anime Sama discovery, search, details, chapters and images match expected.json", async () => {
   const fixtures = {
     catalogue: await fixture("catalogue.html"),
+    cataloguePage: await fixture("catalogue-page.html"),
     series: await fixture("series.html"),
+    seriesLueur: await fixture("series-lueur.html"),
     chapters: await fixture("chapters.json"),
     chaptersError: await fixture("chapters-error.json"),
   };
@@ -61,10 +68,11 @@ test("Anime Sama discovery, search, details, chapters and images match expected.
     assert.match(item.href, /^https:\/\/anime-sama\.to\/catalogue\//);
     assert.ok(item.image === "" || item.image.startsWith("https://"), "cover must be HTTPS");
   }
-  // Duplicates, unsafe titles, untitled cards and anime cards never surface.
+  // Duplicates, unsafe titles, untitled cards and anime-only homepage
+  // cards never surface; catalogue-only works are appended after.
   assert.deepEqual(
     plain((await module.discoveryHome()).sections[0].items.map(({ id }) => ({ id }))),
-    [{ id: "fixture-aurore" }, { id: "fixture-brume" }],
+    [{ id: "fixture-aurore" }, { id: "fixture-brume" }, { id: "fixture-lueur" }, { id: "fixture-anime" }],
   );
   assert.deepEqual(plain(await module.discoveryFeed("scans", 1)), {
     items: expected.discovery.sections[0].items,
@@ -76,6 +84,13 @@ test("Anime Sama discovery, search, details, chapters and images match expected.
     [{ id: "fixture-brume" }],
   );
   assert.deepEqual(plain(await module.extractDetails("fixture-aurore")), expected.details);
+  // Catalogue-only works resolve too; status mapping applies (Terminé).
+  const lueur = await module.extractDetails("fixture-lueur");
+  assert.equal(lueur.title, "Fixture Lueur");
+  assert.equal(lueur.status, "Completed");
+  assert.equal((await module.extractChapters("fixture-lueur")).length, 3);
+  // Works without a scan version are excluded with a clear message.
+  await assert.rejects(() => module.extractDetails("fixture-anime"), /no scan version/i);
   assert.deepEqual(
     plain(await module.extractChapters("https://anime-sama.to/catalogue/fixture-aurore/scan/vf/")),
     expected.chapters,
@@ -93,7 +108,9 @@ test("Anime Sama discovery, search, details, chapters and images match expected.
 test("Anime Sama rejects unsafe, empty, challenge and invalid inputs", async () => {
   const fixtures = {
     catalogue: await fixture("catalogue.html"),
+    cataloguePage: await fixture("catalogue-page.html"),
     series: await fixture("series.html"),
+    seriesLueur: await fixture("series-lueur.html"),
     chapters: await fixture("chapters.json"),
     chaptersError: await fixture("chapters-error.json"),
   };

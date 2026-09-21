@@ -30,6 +30,32 @@
             "genres": [],
             "status": "",
             "language": "fr"
+          },
+          {
+            "id": "fixture-lueur",
+            "href": "https://anime-sama.to/catalogue/fixture-lueur/scan/vf/",
+            "url": "https://anime-sama.to/catalogue/fixture-lueur/scan/vf/",
+            "title": "Fixture Lueur",
+            "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-lueur.webp",
+            "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-lueur.webp",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          },
+          {
+            "id": "fixture-anime",
+            "href": "https://anime-sama.to/catalogue/fixture-anime/scan/vf/",
+            "url": "https://anime-sama.to/catalogue/fixture-anime/scan/vf/",
+            "title": "Fixture Anime",
+            "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-anime.webp",
+            "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-anime.webp",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
           }
         ]
       }

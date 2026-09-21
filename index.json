@@ -82,7 +82,7 @@
       "id": "anime-sama-v1",
       "familyID": "anime-sama-v1",
       "name": "Anime Sama Manga",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "language": "fr",
       "contentType": "pageImages",
       "contentRating": "suggestive",
@@ -90,7 +90,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/anime-sama/manifest.json",
-        "sha256": "2ef1c045908af893a0d446409133d0e6cd3f031c3005d532e7b85973605dd652"
+        "sha256": "cf6e61f31d13f915f1ce476996359e77ec896db0f1a9e8484717c85cddaf38ac"
       },
       "icon": {
         "path": "modules/anime-sama/icon.png",
