@@ -77,6 +77,25 @@
         "path": "modules/novelneko-ln/icon.png",
         "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
       }
+    },
+    {
+      "id": "sushiscan-v1",
+      "familyID": "sushiscan-v1",
+      "name": "Sushi Scan",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "pageImages",
+      "contentRating": "unknown",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/sushiscan/manifest.json",
+        "sha256": "712a1c7b6839cd55fec38cbb1ef0385513a9e8dc5c8180f5d9c03216323a05a0"
+      },
+      "icon": {
+        "path": "modules/sushiscan/icon.png",
+        "sha256": "c476c505029f5f6719ea5556ca676a3ca58290dcd9792b9619c02a0c3c2f0a54"
+      }
     }
   ],
   "repository": {

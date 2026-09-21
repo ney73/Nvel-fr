@@ -12,6 +12,9 @@
     },
     "novelneko-ln": {
       "chapterScope": "selected-series-dom"
+    },
+    "sushiscan-v1": {
+      "chapterScope": "unknown"
     }
   }
 }

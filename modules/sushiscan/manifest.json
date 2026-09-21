@@ -1,0 +1,45 @@
+{
+  "allowedHosts": [
+    "sushiscan.net"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "website": "https://sushiscan.net"
+  },
+  "baseURL": "https://sushiscan.net",
+  "capabilities": [
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "discovery"
+  ],
+  "contentRating": "unknown",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/sushiscan/index.js",
+    "sha256": "3d7c4c5092bc9ac29b3176bdb86593feb0723ce29b5e162b9a6fccc27b44f303"
+  },
+  "familyID": "sushiscan-v1",
+  "icon": {
+    "path": "modules/sushiscan/icon.png",
+    "sha256": "c476c505029f5f6719ea5556ca676a3ca58290dcd9792b9619c02a0c3c2f0a54"
+  },
+  "id": "sushiscan-v1",
+  "language": "fr",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 900,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 4194304,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Sushi Scan",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://sushiscan.net",
+  "version": "0.1.0"
+}
