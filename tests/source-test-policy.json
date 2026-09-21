@@ -12,6 +12,9 @@
     },
     "novelneko-ln": {
       "chapterScope": "selected-series-dom"
+    },
+    "anime-sama-v1": {
+      "chapterScope": "api"
     }
   }
 }

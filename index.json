@@ -77,6 +77,25 @@
         "path": "modules/novelneko-ln/icon.png",
         "sha256": "984787e95c15008f53b49814bb73228cc0d9266dc650b9e7079c9dd704a5ac31"
       }
+    },
+    {
+      "id": "anime-sama-v1",
+      "familyID": "anime-sama-v1",
+      "name": "Anime Sama Manga",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "pageImages",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/anime-sama/manifest.json",
+        "sha256": "2ef1c045908af893a0d446409133d0e6cd3f031c3005d532e7b85973605dd652"
+      },
+      "icon": {
+        "path": "modules/anime-sama/icon.png",
+        "sha256": "30ea661577447c6dbaa5f37120d477a5be5822da2c02cf3c07f5d56655628e21"
+      }
     }
   ],
   "repository": {

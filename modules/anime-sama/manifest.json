@@ -1,0 +1,47 @@
+{
+  "allowedHosts": [
+    "anime-sama.to",
+    "cdn.jsdelivr.net",
+    "raw.githubusercontent.com"
+  ],
+  "attribution": {
+    "author": "Synthetiq-HQ",
+    "website": "https://anime-sama.to"
+  },
+  "baseURL": "https://anime-sama.to",
+  "capabilities": [
+    "search",
+    "details",
+    "chapters",
+    "images",
+    "discovery"
+  ],
+  "contentRating": "suggestive",
+  "contentType": "pageImages",
+  "contractVersion": 1,
+  "entry": {
+    "path": "modules/anime-sama/index.js",
+    "sha256": "be4fbc7628e1fed56c808db67cbaba9dc9c0d7b98827a0862c032694a3010731"
+  },
+  "familyID": "anime-sama-v1",
+  "icon": {
+    "path": "modules/anime-sama/icon.png",
+    "sha256": "30ea661577447c6dbaa5f37120d477a5be5822da2c02cf3c07f5d56655628e21"
+  },
+  "id": "anime-sama-v1",
+  "language": "fr",
+  "legacyIDs": [],
+  "limits": {
+    "cacheTTLSeconds": 900,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 4194304,
+    "maxScriptBytes": 524288,
+    "timeoutMilliseconds": 30000
+  },
+  "minimumAppVersion": "1.0.0",
+  "name": "Anime Sama Manga",
+  "releaseTrack": "beta",
+  "status": "active",
+  "universalLink": "https://anime-sama.to",
+  "version": "0.1.0"
+}

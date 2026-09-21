@@ -1,0 +1,106 @@
+{
+  "discovery": {
+    "sections": [
+      {
+        "id": "scans",
+        "title": "Scans",
+        "items": [
+          {
+            "id": "fixture-aurore",
+            "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+            "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+            "title": "Fixture Aurore",
+            "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-aurore.webp",
+            "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-aurore.webp",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          },
+          {
+            "id": "fixture-brume",
+            "href": "https://anime-sama.to/catalogue/fixture-brume/scan/vf/",
+            "url": "https://anime-sama.to/catalogue/fixture-brume/scan/vf/",
+            "title": "Fixture Brume",
+            "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-brume.webp",
+            "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-brume.webp",
+            "author": "",
+            "authors": [],
+            "genres": [],
+            "status": "",
+            "language": "fr"
+          }
+        ]
+      }
+    ]
+  },
+  "search": {
+    "items": [
+      {
+        "id": "fixture-aurore",
+        "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+        "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+        "title": "Fixture Aurore",
+        "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-aurore.webp",
+        "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/thumb/fixture-aurore.webp",
+        "author": "",
+        "authors": [],
+        "genres": [],
+        "status": "",
+        "language": "fr"
+      }
+    ],
+    "hasMore": false
+  },
+  "details": {
+    "id": "fixture-aurore",
+    "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+    "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/",
+    "title": "Fixture Aurore",
+    "description": "",
+    "image": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/fixture-aurore.jpg",
+    "cover": "https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/fixture-aurore.jpg",
+    "author": "",
+    "authors": [],
+    "genres": [],
+    "status": "Ongoing",
+    "language": "fr"
+  },
+  "chapters": [
+    {
+      "id": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-1",
+      "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-1",
+      "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-1",
+      "number": 1,
+      "title": "Chapitre 1",
+      "language": "fr"
+    },
+    {
+      "id": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-2",
+      "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-2",
+      "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-2",
+      "number": 2,
+      "title": "Chapitre 2",
+      "language": "fr"
+    },
+    {
+      "id": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-3",
+      "href": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-3",
+      "url": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/#chapitre-3",
+      "number": 3,
+      "title": "Chapitre 3",
+      "language": "fr"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://anime-sama.to/s2/scans/Fixture%20Aurore/1/1.jpg",
+      "headers": { "Referer": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/" }
+    },
+    {
+      "url": "https://anime-sama.to/s2/scans/Fixture%20Aurore/1/2.jpg",
+      "headers": { "Referer": "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/" }
+    }
+  ]
+}

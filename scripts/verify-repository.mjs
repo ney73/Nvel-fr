@@ -11,6 +11,7 @@ const expectedHandlers = {
   "internet-archive-text": ["searchResults", "extractDetails", "extractChapters", "extractText"],
   "novelneko-wn": ["searchResults", "extractDetails", "extractChapters", "extractText"],
   "novelneko-ln": ["searchResults", "extractDetails", "extractResources"],
+  "anime-sama": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   lnori: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   witchculttranslation: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   mangafire: ["searchResults", "extractDetails", "extractChapters", "extractImages"],
