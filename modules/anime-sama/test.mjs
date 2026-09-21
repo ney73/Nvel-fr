@@ -37,6 +37,7 @@ function router(fixtures) {
     assert.ok(["anime-sama.to", "cdn.jsdelivr.net"].includes(parsed.hostname), `unapproved host ${parsed.hostname}`);
     if (url === "https://anime-sama.to/") return response(fixtures.catalogue);
     if (url === "https://anime-sama.to/catalogue/") return response(fixtures.cataloguePage);
+    if (url === "https://anime-sama.to/sitemap.xml") return response(fixtures.sitemap);
     if (url === "https://anime-sama.to/catalogue/fixture-aurore/scan/vf/") return response(fixtures.series);
     if (url === "https://anime-sama.to/catalogue/fixture-lueur/scan/vf/") return response(fixtures.seriesLueur);
     if (url === "https://anime-sama.to/catalogue/fixture-anime/scan/vf/") return response("Not Found", 404);
@@ -54,6 +55,7 @@ test("Anime Sama discovery, search, details, chapters and images match expected.
   const fixtures = {
     catalogue: await fixture("catalogue.html"),
     cataloguePage: await fixture("catalogue-page.html"),
+    sitemap: await fixture("sitemap.xml"),
     series: await fixture("series.html"),
     seriesLueur: await fixture("series-lueur.html"),
     chapters: await fixture("chapters.json"),
@@ -68,11 +70,22 @@ test("Anime Sama discovery, search, details, chapters and images match expected.
     assert.match(item.href, /^https:\/\/anime-sama\.to\/catalogue\//);
     assert.ok(item.image === "" || item.image.startsWith("https://"), "cover must be HTTPS");
   }
-  // Duplicates, unsafe titles, untitled cards and anime-only homepage
-  // cards never surface; catalogue-only works are appended after.
+  // Duplicates, unsafe titles, untitled cards, VA/special-edition variants
+  // and anime-only URLs never surface; catalogue and sitemap works append.
   assert.deepEqual(
     plain((await module.discoveryHome()).sections[0].items.map(({ id }) => ({ id }))),
-    [{ id: "fixture-aurore" }, { id: "fixture-brume" }, { id: "fixture-lueur" }, { id: "fixture-anime" }],
+    [
+      { id: "fixture-aurore" }, { id: "fixture-brume" },
+      { id: "fixture-lueur" }, { id: "fixture-anime" }, { id: "fixture-solo" },
+    ],
+  );
+  // Covers are full posters, never banner thumbnails.
+  for (const item of (await module.discoveryHome()).sections[0].items) {
+    assert.match(item.image, /\/contenu\/[^/]+\.jpg$/);
+  }
+  assert.deepEqual(
+    plain((await module.searchResults("solo", 1)).items.map(({ id, title }) => ({ id, title }))),
+    [{ id: "fixture-solo", title: "Fixture Solo" }],
   );
   assert.deepEqual(plain(await module.discoveryFeed("scans", 1)), {
     items: expected.discovery.sections[0].items,
@@ -109,6 +122,7 @@ test("Anime Sama rejects unsafe, empty, challenge and invalid inputs", async () 
   const fixtures = {
     catalogue: await fixture("catalogue.html"),
     cataloguePage: await fixture("catalogue-page.html"),
+    sitemap: await fixture("sitemap.xml"),
     series: await fixture("series.html"),
     seriesLueur: await fixture("series-lueur.html"),
     chapters: await fixture("chapters.json"),

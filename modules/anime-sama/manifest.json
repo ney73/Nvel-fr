@@ -21,7 +21,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/anime-sama/index.js",
-    "sha256": "6dec1b68d7836bd2477ab231b97367b66db97ad21582fb06ca5c0261d8ea22f3"
+    "sha256": "ce7c00622c01eb3d2836261480b3f4a0dd3a16361fede98a2739dd561a675347"
   },
   "familyID": "anime-sama-v1",
   "icon": {
@@ -43,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://anime-sama.to",
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

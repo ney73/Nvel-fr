@@ -3,12 +3,15 @@
 // Anime Sama Manga (https://anime-sama.to) — French scan reader module.
 //
 // Scope: the Scans catalogue only (VF scan works). The anime streaming
-// section (video embeds) is out of scope for this pageImages-type module.
+// section (video embeds) and non-French scan editions (VA, special editions)
+// are out of scope for this pageImages-type module.
 // Observed data flow:
-// - discovery unions two bounded pages: homepage scan cards linking
-//   /catalogue/<slug>/scan/vf/ (proven scans) and the /catalogue/ page cards
-//   linking /catalogue/<slug> (every work; scan availability is confirmed
-//   lazily when its scan page is opened, avoiding a per-work crawl);
+// - discovery unions three bounded pages: the sitemap (every standard
+//   /catalogue/<slug>/scan/vf/ URL), the homepage scan cards and the
+//   /catalogue/ page cards (real titles); scan availability for entries
+//   without a proven scan link is confirmed lazily when opened;
+// - covers always use the full vertical poster (contenu/<slug>.jpg, the same
+//   file the series pages use) instead of the 16:9 banner thumbnails;
 // - series scan page: #titreOeuvre (display title), #imgOeuvre (cover),
 //   #avOeuvre (status line);
 // - chapters: /s2/scans/get_nb_chap_et_img.php?oeuvre=<DisplayTitle> returns
@@ -119,6 +122,22 @@
 
   function scanPageURL(slug) {
     return `${BASE_URL}/catalogue/${slug}/scan/vf/`;
+  }
+
+  function posterURL(slug) {
+    // Full vertical poster: the same file the series pages use (#imgOeuvre).
+    // Homepage thumbnails are 16:9 banner crops and are never used.
+    return `https://cdn.jsdelivr.net/gh/Anime-Sama/IMG@img/contenu/${slug}.jpg`;
+  }
+
+  function titleWords(slug) {
+    // Fallback title for sitemap-only entries (no card observed): readable
+    // slug words. The exact display title resolves when details are opened.
+    return String(slug || "")
+      .split(/[-_]+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   }
 
   function chapterID(slug, number) {
@@ -294,8 +313,7 @@
     if (!titleMatch) return null;
     const rawTitle = cleanText(titleMatch[1]);
     if (!rawTitle || hasUnsafeMarker(rawTitle)) return null;
-    const imgMatch = block.match(/<img\b[^>]*(?:src|data-src|data-lazy-src)="([^"]+)"[^>]*>/i);
-    const image = imgMatch ? absoluteURL(decodeEntities(imgMatch[1]).trim(), BASE_URL) : "";
+    const image = posterURL(slug);
     seen.add(slug);
     const page = scanPageURL(slug);
     return {
@@ -305,19 +323,51 @@
     };
   }
 
+  function parseSitemapSlugs(xml) {
+    // Standard VF scan URLs only (/catalogue/<slug>/scan/vf/): VA and
+    // special-edition variants (scan_noir-et-blanc, scan-vigilantes, ...)
+    // need per-edition title mapping that has not been observed.
+    const slugs = [];
+    const seen = new Set();
+    const pattern = /<loc>https:\/\/anime-sama\.to\/catalogue\/([A-Za-z0-9_.~-]+)\/scan\/vf\/<\/loc>/gi;
+    let match;
+    while ((match = pattern.exec(String(xml || ""))) !== null) {
+      const slug = match[1];
+      if (!SLUG_PATTERN.test(slug) || seen.has(slug)) continue;
+      seen.add(slug);
+      slugs.push(slug);
+    }
+    return slugs;
+  }
+
   async function loadCatalogue() {
     if (catalogueCache.data) return catalogueCache.data;
-    // Two bounded pages, fetched in parallel and merged by slug: homepage
-    // scan cards first, then catalogue-only works appended.
-    const [home, catalogue] = await Promise.all([
+    // Three bounded pages, fetched in parallel and merged by slug: homepage
+    // scan cards and /catalogue/ cards first (real titles), then sitemap-only
+    // slugs (derived titles) appended in sitemap order.
+    const [home, catalogue, sitemap] = await Promise.all([
       requestHTML(BASE_URL).catch(() => ""),
       requestHTML(`${BASE_URL}/catalogue/`).catch(() => ""),
+      requestURL(`${BASE_URL}/sitemap.xml`, DEFAULT_HEADERS, "html").catch(() => ""),
     ]);
+    if (!home && !catalogue && !sitemap) throw new Error("Anime Sama catalogue is unavailable.");
     const seen = new Set();
     const items = [...parseCatalogueCards(home)];
     for (const item of items) seen.add(item.id);
     for (const item of parseCatalogRoots(catalogue, seen)) items.push(item);
-    if (!home && !catalogue) throw new Error("Anime Sama catalogue is unavailable.");
+    for (const slug of parseSitemapSlugs(sitemap)) {
+      if (seen.has(slug)) continue;
+      const rawTitle = titleWords(slug);
+      if (!rawTitle || hasUnsafeMarker(rawTitle)) continue;
+      seen.add(slug);
+      const page = scanPageURL(slug);
+      const image = posterURL(slug);
+      items.push({
+        id: slug, href: page, url: page, title: rawTitle,
+        image, cover: image, author: "", authors: [],
+        genres: [], status: "", language: "fr",
+      });
+    }
     catalogueCache.data = items;
     return items;
   }
