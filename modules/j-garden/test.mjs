@@ -75,6 +75,8 @@ test("JGarden discovery, search, details, chapters and resources match expected.
   for (const section of expected.discovery.sections) {
     for (const item of section.items) {
       assert.ok(item.id && item.title && item.href && typeof item.image === "string", "item schema");
+      assert.equal(item.coverUrl, item.cover, "cover alias must match");
+      assert.ok(/^https:\/\/j-garden\.fr\//.test(item.image || item.coverUrl || ""), "cover must be an absolute source URL");
       assert.match(item.href, /^https:\/\/j-garden\.fr\//);
       assert.ok(item.image === "" || item.image.startsWith("https://"), "cover must be HTTPS");
       assert.ok(!item.href.includes("#"), "href must not carry a fragment");

@@ -19,7 +19,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/j-garden/index.js",
-    "sha256": "1914f008c0b35a309aae3065cbea899f89409b2804a4687def94f10b80ea3bb3"
+    "sha256": "6aab794a3f9fcd3bc775453c3f3e53ad6ca9995bb5b3802e0702db40dbbad0e8"
   },
   "familyID": "j-garden-v1",
   "icon": {
@@ -41,5 +41,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://j-garden.fr",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

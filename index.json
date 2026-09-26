@@ -101,7 +101,7 @@
       "id": "j-garden-v1",
       "familyID": "j-garden-v1",
       "name": "JGarden",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "language": "fr",
       "contentType": "publication",
       "contentRating": "suggestive",
@@ -109,7 +109,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/j-garden/manifest.json",
-        "sha256": "644fbd5fdc2934bb43a8a4bdd4ee6ef334d51bd1708071ecd56ec124f7e189bc"
+        "sha256": "68526bbf9944f03a7462509a9a3757a0746978fc7161cadafea0f14903b4c1b6"
       },
       "icon": {
         "path": "modules/j-garden/icon.png",

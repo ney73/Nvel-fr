@@ -12,7 +12,8 @@
             "title": "Fixture Aurore",
             "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-banner.png",
             "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-banner.png",
-            "language": "fr"
+            "language": "fr",
+            "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-banner.png"
           },
           {
             "id": "fixture-boreal",
@@ -21,7 +22,8 @@
             "title": "Fixture Boreal",
             "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-banner.png",
             "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-banner.png",
-            "language": "fr"
+            "language": "fr",
+            "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-banner.png"
           },
           {
             "id": "fixture-aurore-t-1",
@@ -30,7 +32,8 @@
             "title": "Fixture Aurore T.1",
             "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png",
             "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png",
-            "language": "fr"
+            "language": "fr",
+            "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png"
           },
           {
             "id": "fixture-boreal-t-1",
@@ -39,7 +42,8 @@
             "title": "Fixture Boreal T.1",
             "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-news.png",
             "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-news.png",
-            "language": "fr"
+            "language": "fr",
+            "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-news.png"
           }
         ]
       }
@@ -54,7 +58,8 @@
         "title": "Fixture Aurore",
         "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-cover.png",
         "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-cover.png",
-        "language": "fr"
+        "language": "fr",
+        "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-cover.png"
       },
       {
         "id": "fixture-boreal",
@@ -63,7 +68,8 @@
         "title": "Fixture Boreal",
         "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-cover.png",
         "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-cover.png",
-        "language": "fr"
+        "language": "fr",
+        "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-boreal-cover.png"
       },
       {
         "id": "fixture-aurore-t-1",
@@ -72,7 +78,8 @@
         "title": "Fixture Aurore T.1",
         "image": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png",
         "cover": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png",
-        "language": "fr"
+        "language": "fr",
+        "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-news.png"
       }
     ],
     "hasMore": true
@@ -96,7 +103,8 @@
       "Médecine"
     ],
     "status": "Ongoing",
-    "language": "fr"
+    "language": "fr",
+    "coverUrl": "https://j-garden.fr/wp-content/uploads/2026/01/fixture-aurore-cover.png"
   },
   "chapters": [
     {

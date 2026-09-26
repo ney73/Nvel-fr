@@ -349,6 +349,7 @@
         title,
         image,
         cover: image,
+        coverUrl: image,
         language: "fr",
       };
     } catch (_) {
@@ -623,6 +624,7 @@
       description: pageDescription(html),
       image,
       cover: image,
+      coverUrl: image,
       author,
       authors: author ? [author] : [],
       genres,
