@@ -119,8 +119,12 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   assert.ok(chapters.every((chapter) => chapter.coverUrl === expected.details.cover));
   assert.deepEqual(
     plain(chapters.map(({ number }) => ({ number }))),
-    [{ number: 1 }, { number: 2 }, { number: 2 }, { number: 3 }, { number: 4 }],
+    [{ number: 1 }, { number: 1 }, { number: 2 }, { number: 2 }, { number: 3 }, { number: 4 }],
   );
+  // The compiled "-vol-" shape is owned too and carries the cover.
+  const vol = chapters.find(({ id }) => id === "fixture-aurore-vol-1");
+  assert.equal(vol.title, "Volume 1");
+  assert.equal(vol.coverUrl, expected.details.cover);
   // Chapters whose catalogue slug carries a numeric prefix ("1-…")
   // still own their unprefixed chapter URLs; foreign links stay out.
   const prefixed = await module.extractChapters("1-fixture-pref");

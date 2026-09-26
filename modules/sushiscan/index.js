@@ -629,10 +629,12 @@
     // Ownership is enforced on the URL itself. Catalogue slugs sometimes
     // carry a numeric disambiguation prefix ("1-blue-lock") that chapter
     // URLs drop ("blue-lock-chapitre-345"), so both shapes own chapters.
+    // Early chapters ship as compiled volumes under a third shape
+    // ("blue-lock-vol-13"), which is equally owned and readable.
     // Anything else (related-series sidebars, foreign mirrors) is rejected.
     const text = String(html || "");
     const bases = [...new Set([seriesSlug, seriesSlug.replace(/^\d+-/, "")])].map(escapeRegExp);
-    const owned = new RegExp(`^/(${bases.join("|")})-(chapitre|volume)-\\d+(?:-\\d+)?/?$`, "i");
+    const owned = new RegExp(`^/(${bases.join("|")})-(chapitre|volume|vol)-\\d+(?:-\\d+)?/?$`, "i");
     const entries = [];
     const seen = new Set();
     const pattern = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
@@ -708,7 +710,7 @@
     } catch (_) {
       throw new Error("Sushi Scan chapter identifier is invalid.");
     }
-    if (!/^\/[^/]+-(chapitre|volume)-\d+(?:-\d+)?\/?$/i.test(pathname)) {
+    if (!/^\/[^/]+-(chapitre|volume|vol)-\d+(?:-\d+)?\/?$/i.test(pathname)) {
       throw new Error("Sushi Scan identifier is not a chapter path.");
     }
     return href;
