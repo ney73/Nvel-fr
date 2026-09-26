@@ -96,25 +96,6 @@
         "path": "modules/anime-sama/icon.png",
         "sha256": "30ea661577447c6dbaa5f37120d477a5be5822da2c02cf3c07f5d56655628e21"
       }
-    },
-    {
-      "id": "scan-manga-v1",
-      "familyID": "scan-manga-v1",
-      "name": "Scan-Manga",
-      "version": "0.1.0",
-      "language": "fr",
-      "contentType": "pageImages",
-      "contentRating": "suggestive",
-      "releaseTrack": "beta",
-      "status": "active",
-      "manifest": {
-        "path": "modules/scan-manga/manifest.json",
-        "sha256": "3af6909175b642e8fb09c370541d64c2bc2ba4951239812729d1b7f1de5cf58d"
-      },
-      "icon": {
-        "path": "modules/scan-manga/icon.png",
-        "sha256": "1c9887719d3097ca597788cb26eb6743bb6964892c0b37b05321ecc41d8b8a9b"
-      }
     }
   ],
   "repository": {

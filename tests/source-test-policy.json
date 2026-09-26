@@ -15,9 +15,6 @@
     },
     "anime-sama-v1": {
       "chapterScope": "api"
-    },
-    "scan-manga-v1": {
-      "chapterScope": "selected-series-dom"
     }
   }
 }
