@@ -13,7 +13,8 @@
             "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
             "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
             "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-            "language": "fr"
+            "language": "fr",
+            "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
           },
           {
             "id": "fixture-boreal",
@@ -23,7 +24,8 @@
             "image": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
             "cover": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
             "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
-            "language": "fr"
+            "language": "fr",
+            "poster": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg"
           },
           {
             "id": "fixture-badge",
@@ -33,7 +35,8 @@
             "image": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
             "cover": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
             "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
-            "language": "fr"
+            "language": "fr",
+            "poster": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg"
           },
           {
             "id": "fixture-lazy",
@@ -43,7 +46,8 @@
             "image": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
             "cover": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
             "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
-            "language": "fr"
+            "language": "fr",
+            "poster": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg"
           }
         ]
       }
@@ -59,7 +63,8 @@
         "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
         "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
         "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-        "language": "fr"
+        "language": "fr",
+        "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
       },
       {
         "id": "fixture-cendre",
@@ -69,7 +74,8 @@
         "image": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
         "cover": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
         "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
-        "language": "fr"
+        "language": "fr",
+        "poster": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg"
       },
       {
         "id": "fixture-recueil",
@@ -79,7 +85,8 @@
         "image": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
         "cover": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
         "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
-        "language": "fr"
+        "language": "fr",
+        "poster": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg"
       }
     ],
     "hasMore": false
@@ -103,7 +110,8 @@
       "Fantasy"
     ],
     "status": "Ongoing",
-    "language": "fr"
+    "language": "fr",
+    "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
   },
   "chapters": [
     {
@@ -114,7 +122,15 @@
       "number": 1,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     },
     {
       "id": "fixture-aurore-vol-1",
@@ -124,7 +140,15 @@
       "number": 1,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     },
     {
       "id": "fixture-aurore-chapitre-2",
@@ -134,7 +158,15 @@
       "number": 2,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     },
     {
       "id": "fixture-aurore-volume-2",
@@ -144,7 +176,15 @@
       "number": 2,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     },
     {
       "id": "fixture-aurore-chapitre-3",
@@ -154,7 +194,15 @@
       "number": 3,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     },
     {
       "id": "fixture-aurore-chapitre-4",
@@ -164,7 +212,15 @@
       "number": 4,
       "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
       "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
-      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "poster": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "manga": {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+      }
     }
   ],
   "images": [

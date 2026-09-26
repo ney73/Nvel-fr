@@ -117,6 +117,16 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   assert.deepEqual(plain(chapters), expected.chapters);
   assert.ok(chapters.every((chapter) => chapter.url.startsWith("https://sushiscan.net/fixture-aurore-")));
   assert.ok(chapters.every((chapter) => chapter.coverUrl === expected.details.cover));
+  // Library screens get the cover under every alias plus a nested manga
+  // object carrying the parent cover.
+  assert.ok(chapters.every((chapter) => chapter.poster === expected.details.cover));
+  assert.deepEqual(plain(chapters[0].manga), {
+    id: expected.details.id,
+    href: expected.details.href,
+    url: expected.details.url,
+    title: expected.details.title,
+    cover: expected.details.cover,
+  });
   assert.deepEqual(
     plain(chapters.map(({ number }) => ({ number }))),
     [{ number: 1 }, { number: 1 }, { number: 2 }, { number: 2 }, { number: 3 }, { number: 4 }],

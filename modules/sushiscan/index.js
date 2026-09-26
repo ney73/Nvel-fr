@@ -274,6 +274,8 @@
     const source = imageTag.match(/\ssrc=(["'])(.*?)\1/i);
     if (source) attributes.push(source[2]);
     for (const candidate of attributes) {
+      // Inline base64 placeholders ("data:image/...") are never covers.
+      if (/^\s*data:/i.test(candidate)) continue;
       const absolute = absoluteURL(candidate, pageURL, true);
       if (!absolute) continue;
       if (/\/lazy_[^/]*$/i.test(absolute)) continue;
@@ -339,6 +341,8 @@
       if (!title || hasUnsafeMarker(title)) return null;
       const image = entry.image || "";
       if (image && hasUnsafeMarker(image)) return null;
+      // "poster" duplicates the cover under the other name reader apps and
+      // library screens look up. Every URL here is absolute HTTPS.
       return {
         id: ref.id,
         href: ref.href,
@@ -347,6 +351,7 @@
         image,
         cover: image,
         coverUrl: image,
+        poster: image,
         language: "fr",
       };
     } catch (_) {
@@ -587,6 +592,7 @@
       image,
       cover: image,
       coverUrl: image,
+      poster: image,
       author,
       authors,
       genres,
@@ -700,9 +706,12 @@
     const html = await requestHTML(ref.href);
     // The series page carries its complete chapter list: every kept row is
     // returned oldest-first, never capped to a UI-sized window. The series
-    // cover rides along on each chapter so "Continue Reading" and library
-    // screens can always display it.
+    // cover rides along on each chapter — flat fields plus a nested manga
+    // object — so "Continue Reading" and library screens can always display
+    // it whatever property name they read.
     const cover = coverImage(html, ref.href);
+    const seriesTitle = pageTitle(html) || humanizeSlug(ref.id);
+    const manga = { id: ref.id, href: ref.href, url: ref.href, title: seriesTitle, cover };
     const collected = parseChapterEntries(html, ref.href, ref.id).map((entry) => ({
       id: chapterID(entry.href),
       href: entry.href,
@@ -712,6 +721,8 @@
       image: cover,
       cover,
       coverUrl: cover,
+      poster: cover,
+      manga,
     }));
     collected.sort((a, b) => {
       if (a.number !== null && b.number !== null && a.number !== b.number) return a.number - b.number;
