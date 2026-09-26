@@ -1,0 +1,128 @@
+{
+  "discovery": {
+    "sections": [
+      {
+        "id": "latest",
+        "title": "Dernières sorties",
+        "items": [
+          {
+            "id": "fixture-aurore",
+            "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+            "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+            "title": "Fixture Aurore",
+            "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+            "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+            "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+            "language": "fr"
+          },
+          {
+            "id": "fixture-boreal",
+            "href": "https://sushiscan.net/catalogue/fixture-boreal/",
+            "url": "https://sushiscan.net/catalogue/fixture-boreal/",
+            "title": "Fixture Boreal",
+            "image": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
+            "cover": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
+            "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
+            "language": "fr"
+          }
+        ]
+      }
+    ]
+  },
+  "search": {
+    "items": [
+      {
+        "id": "fixture-aurore",
+        "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+        "title": "Fixture Aurore",
+        "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+        "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+        "language": "fr"
+      },
+      {
+        "id": "fixture-cendre",
+        "href": "https://sushiscan.net/catalogue/fixture-cendre/",
+        "url": "https://sushiscan.net/catalogue/fixture-cendre/",
+        "title": "Fixture Cendre",
+        "image": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
+        "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
+        "language": "fr"
+      }
+    ],
+    "hasMore": false
+  },
+  "details": {
+    "id": "fixture-aurore",
+    "href": "https://sushiscan.net/catalogue/fixture-aurore/",
+    "url": "https://sushiscan.net/catalogue/fixture-aurore/",
+    "title": "Fixture Aurore",
+    "description": "Une apprentie cartographe découvre une cité ensevelie sous les cendres et décide d'en dresser la première carte complète.\n\nSon voyage la mène des dunes silencieuses jusqu'aux archives inondées de la capitale.",
+    "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+    "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+    "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+    "author": "Auteur Inventé, Dessinateur Inventé",
+    "authors": [
+      "Auteur Inventé",
+      "Dessinateur Inventé"
+    ],
+    "genres": [
+      "Aventure",
+      "Fantasy"
+    ],
+    "status": "Ongoing",
+    "language": "fr"
+  },
+  "chapters": [
+    {
+      "id": "fixture-aurore-chapitre-1",
+      "href": "https://sushiscan.net/fixture-aurore-chapitre-1/",
+      "url": "https://sushiscan.net/fixture-aurore-chapitre-1/",
+      "title": "Chapitre 1",
+      "number": 1
+    },
+    {
+      "id": "fixture-aurore-chapitre-2",
+      "href": "https://sushiscan.net/fixture-aurore-chapitre-2/",
+      "url": "https://sushiscan.net/fixture-aurore-chapitre-2/",
+      "title": "Chapitre 2",
+      "number": 2
+    },
+    {
+      "id": "fixture-aurore-volume-2",
+      "href": "https://sushiscan.net/fixture-aurore-volume-2/",
+      "url": "https://sushiscan.net/fixture-aurore-volume-2/",
+      "title": "Vol. 2",
+      "number": 2
+    },
+    {
+      "id": "fixture-aurore-chapitre-3",
+      "href": "https://sushiscan.net/fixture-aurore-chapitre-3/",
+      "url": "https://sushiscan.net/fixture-aurore-chapitre-3/",
+      "title": "Chapitre 3",
+      "number": 3
+    }
+  ],
+  "images": [
+    {
+      "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-01.webp",
+      "headers": {
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+      }
+    },
+    {
+      "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-02.webp",
+      "headers": {
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+      }
+    },
+    {
+      "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-03.webp",
+      "headers": {
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+      }
+    }
+  ]
+}

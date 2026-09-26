@@ -96,6 +96,25 @@
         "path": "modules/anime-sama/icon.png",
         "sha256": "30ea661577447c6dbaa5f37120d477a5be5822da2c02cf3c07f5d56655628e21"
       }
+    },
+    {
+      "id": "sushiscan-v1",
+      "familyID": "sushiscan-v1",
+      "name": "Sushi Scan",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "pageImages",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/sushiscan/manifest.json",
+        "sha256": "300de18f54960cde0563192f2a0bf35087b5448f187fb1fcc0b11e3911af5ad7"
+      },
+      "icon": {
+        "path": "modules/sushiscan/icon.png",
+        "sha256": "5a6242dd1e359503cf6ee90823fef9f82da486ad28c0877bec0f4965db0ab3bf"
+      }
     }
   ],
   "repository": {
