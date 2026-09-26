@@ -40,7 +40,7 @@ function router(fixtures) {
     );
     if (parsed.pathname === "/catalogue/fixture-aurore/") return response(fixtures.details);
     if (parsed.pathname === "/catalogue/fixture-boreal/") return response(fixtures.details);
-    if (parsed.pathname === "/catalogue/1-fixture-pref/") return response(fixtures.detailsPrefixed);
+    if (parsed.pathname === "/catalogue/1-fixture-preff/") return response(fixtures.detailsPrefixed);
     if (parsed.pathname === "/fixture-aurore-chapitre-3/") return response(fixtures.chapter);
     if (parsed.pathname === "/fixture-aurore-chapitre-2/") return response(fixtures.chapterFallback);
     if (parsed.searchParams.has("s")) {
@@ -126,16 +126,18 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   assert.equal(vol.title, "Volume 1");
   assert.equal(vol.coverUrl, expected.details.cover);
   // Chapters whose catalogue slug carries a numeric prefix ("1-…")
-  // still own their unprefixed chapter URLs; foreign links stay out.
-  const prefixed = await module.extractChapters("1-fixture-pref");
+  // still own their unprefixed chapter URLs; a mismatched chapter stem
+  // ("pluuto" catalogue vs "pluto" volumes) is adopted when unambiguous,
+  // while the unrelated sidebar link stays out.
+  const prefixed = await module.extractChapters("1-fixture-preff");
   assert.deepEqual(
     plain(prefixed.map(({ id, title, number }) => ({ id, title, number }))),
     [
-      { id: "fixture-pref-chapitre-1", title: "Chapitre 1", number: 1 },
-      { id: "fixture-pref-chapitre-2", title: "Chapitre 2", number: 2 },
+      { id: "fixture-pref-vol-1", title: "Volume 1", number: 1 },
+      { id: "fixture-pref-vol-2", title: "Volume 2", number: 2 },
     ],
   );
-  assert.ok(prefixed.every((chapter) => chapter.coverUrl.endsWith("/FixturePrefCover.jpg")));
+  assert.ok(prefixed.every((chapter) => chapter.coverUrl.endsWith("/FixturePreffCover.jpg")));
   // Page images come from the embedded reader payload, in payload order,
   // foreign mirrors excluded.
   const images = await module.extractImages("fixture-aurore-chapitre-3");

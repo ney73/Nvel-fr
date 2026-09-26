@@ -626,17 +626,21 @@
   function parseChapterEntries(html, pageURL, seriesSlug) {
     // Container-independent: chapter anchors are collected wherever they
     // render (#chapterlist, .eplister, .clstyle rows, collapsible volumes).
-    // Ownership is enforced on the URL itself. Catalogue slugs sometimes
-    // carry a numeric disambiguation prefix ("1-blue-lock") that chapter
-    // URLs drop ("blue-lock-chapitre-345"), so both shapes own chapters.
-    // Early chapters ship as compiled volumes under a third shape
-    // ("blue-lock-vol-13"), which is equally owned and readable.
-    // Anything else (related-series sidebars, foreign mirrors) is rejected.
+    // Ownership is enforced on the URL stem. Catalogue slugs sometimes carry
+    // a numeric disambiguation prefix ("1-blue-lock") that chapter URLs drop
+    // ("blue-lock-chapitre-345"), and a catalogue slug can even mismatch its
+    // chapter stem outright ("pluuto" vs "pluto-vol-8"). Both shapes own
+    // chapters. When nothing matches the catalogue slug, the page's dominant
+    // chapter family is adopted only if unambiguous (3+ links, or a stem
+    // textually overlapping the slug); related-series sidebars stay out.
+    // Early chapters ship as compiled volumes under "-vol-" URLs, which are
+    // equally owned and readable.
     const text = String(html || "");
     const bases = [...new Set([seriesSlug, seriesSlug.replace(/^\d+-/, "")])].map(escapeRegExp);
     const owned = new RegExp(`^/(${bases.join("|")})-(chapitre|volume|vol)-\\d+(?:-\\d+)?/?$`, "i");
-    const entries = [];
-    const seen = new Set();
+    const shaped = /^\/([^/]+)-(chapitre|volume|vol)-\d+(?:-\d+)?\/?$/i;
+    const slugFolded = fold(seriesSlug);
+    const candidates = [];
     const pattern = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
     let match;
     while ((match = pattern.exec(text)) !== null) {
@@ -648,13 +652,37 @@
       } catch (_) {
         continue;
       }
-      if (!owned.test(pathname)) continue;
-      if (seen.has(href)) continue;
+      const shape = pathname.match(shaped);
+      if (!shape) continue;
       const numbered = (match[2].match(/<span\b[^>]*class="[^"]*chapternum[^"]*"[^>]*>([\s\S]*?)<\/span>/i) || [])[1];
       const behind = text.slice(Math.max(0, match.index - 600), match.index);
       const dataNum = (behind.match(/<li\b[^>]*data-num="([^"]+)"[^>]*>(?!.*<li\b[^>]*data-num=)/is) || [])[1];
       const title = cleanText(numbered || dataNum || match[2]);
       if (!title || hasUnsafeMarker(title)) continue;
+      candidates.push({ href, title, stem: shape[1].toLowerCase(), direct: owned.test(pathname) });
+    }
+    const direct = candidates.filter((entry) => entry.direct);
+    let kept = direct;
+    if (direct.length === 0) {
+      const groups = new Map();
+      for (const entry of candidates) {
+        if (!groups.has(entry.stem)) groups.set(entry.stem, []);
+        groups.get(entry.stem).push(entry);
+      }
+      let adopted = [];
+      for (const [stem, entries] of groups) {
+        const overlaps = slugFolded.includes(fold(stem)) || fold(stem).includes(slugFolded);
+        if (entries.length >= 3 || (overlaps && entries.length >= 1)) {
+          if (entries.length > adopted.length) adopted = entries;
+        }
+      }
+      kept = adopted;
+    }
+    // Deduplicate by URL, preserving document order.
+    const seen = new Set();
+    const entries = [];
+    for (const { href, title } of kept) {
+      if (seen.has(href)) continue;
       seen.add(href);
       entries.push({ href, title });
     }
