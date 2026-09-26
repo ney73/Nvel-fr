@@ -20,7 +20,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/sushiscan/index.js",
-    "sha256": "2e9b794c058f54841676798e5a308d59e9df0e56e5b7d6cef3af1ba84f6c3263"
+    "sha256": "eedea394176c8216261c81d6da5a1277b3858ddb486d9ae90479f44cfbd8ea41"
   },
   "familyID": "sushiscan-v1",
   "icon": {
@@ -42,5 +42,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://sushiscan.net",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

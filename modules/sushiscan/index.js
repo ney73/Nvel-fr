@@ -248,12 +248,43 @@
 
   function coverFromVicinity(imageTag, pageURL) {
     if (!imageTag) return "";
+    // Covers are often lazy-loaded: data-original / data-lazy-src / data-src
+    // carry the real file while src holds a placeholder (or nothing), and
+    // srcset lists candidates. The first usable source-hosted file wins;
+    // placeholders never count as covers.
+    const attributes = [];
+    for (const name of ["data-original", "data-lazy-src", "data-src"]) {
+      const found = imageTag.match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
+      if (found) attributes.push(found[2]);
+    }
+    const srcset = imageTag.match(/\ssrcset=(["'])(.*?)\1/i);
+    if (srcset) {
+      for (const candidate of srcset[2].split(",")) {
+        const url = candidate.trim().split(/\s+/)[0];
+        if (url) attributes.push(url);
+      }
+    }
     const source = imageTag.match(/\ssrc=(["'])(.*?)\1/i);
-    if (!source) return "";
-    const absolute = absoluteURL(source[2], pageURL, true);
-    if (!absolute) return "";
-    if (!/\/(wp-content|uploads|media|cover|img)\//i.test(absolute)) return "";
-    return absolute;
+    if (source) attributes.push(source[2]);
+    for (const candidate of attributes) {
+      const absolute = absoluteURL(candidate, pageURL, true);
+      if (!absolute) continue;
+      if (/\/lazy_[^/]*$/i.test(absolute)) continue;
+      if (!/\/(wp-content|uploads|media|cover|img)\//i.test(absolute)) continue;
+      return absolute;
+    }
+    return "";
+  }
+
+  function cleanSeriesTitle(value) {
+    // Listing anchors carry site labels around the real series name
+    // ("Manga One Piece Chapitre 1180"). The leading category prefix and a
+    // trailing chapter reference are stripped; a trailing "Volume N" is kept
+    // because it can genuinely belong to the series title.
+    let title = cleanText(value);
+    title = title.replace(/^(?:manga|manhwa|manhua|novel|webtoon|bd|comics?|artbook|fanbook)\s*[:\-–—]?\s+/i, "").trim();
+    title = title.replace(/\s+(?:chapitre|ch\.?)\s*\d+(?:[.,]\d+)?\s*$/i, "").trim();
+    return title;
   }
 
   function safeItem(entry) {
@@ -261,7 +292,7 @@
     try {
       const ref = parseSeriesRef(absoluteURL(entry.href) || "");
       if (!ref) return null;
-      let title = cleanText(entry.title);
+      let title = cleanSeriesTitle(entry.title);
       if (!title) title = humanizeSlug(ref.id);
       if (!title || hasUnsafeMarker(title)) return null;
       const image = entry.image || "";
@@ -537,21 +568,20 @@
     return Number.isFinite(value) ? value : null;
   }
 
-  function parseChapterEntries(html, pageURL) {
-    // The chapter list renders li rows with a data-num label and a
-    // "chapitre/volume" anchor. Only source-owned chapter/volume targets
-    // are kept.
+  function parseChapterEntries(html, pageURL, seriesSlug) {
+    // Container-independent: chapter anchors are collected wherever they
+    // render (#chapterlist, .eplister, .clstyle rows, collapsible volumes).
+    // Ownership is enforced on the URL itself — only "{seriesSlug}-chapitre-"
+    // / "-volume-" targets are kept, so related-series sidebars can never
+    // leak foreign chapters into this series.
+    const text = String(html || "");
+    const owned = new RegExp(`^/${seriesSlug}-(chapitre|volume)-\\d+(?:-\\d+)?/?$`, "i");
     const entries = [];
     const seen = new Set();
-    const list = (String(html || "").match(/<div\b[^>]*id="chapterlist"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/i) || [])[1]
-      || String(html || "");
-    const pattern = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
-    let row;
-    while ((row = pattern.exec(list)) !== null) {
-      const body = row[1];
-      const link = body.match(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
-      if (!link) continue;
-      const href = absoluteURL(link[1], pageURL, true);
+    const pattern = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const href = absoluteURL(match[1], pageURL, true);
       if (!href) continue;
       let pathname = "";
       try {
@@ -559,14 +589,12 @@
       } catch (_) {
         continue;
       }
-      if (!/^\/[^/]+-(chapitre|volume)-\d+(?:-\d+)?\/?$/i.test(pathname)) continue;
+      if (!owned.test(pathname)) continue;
       if (seen.has(href)) continue;
-      // The anchor carries the number label plus a date span: only the
-      // number label (or the row's data-num label) is the chapter title.
-      const numbered = (body.match(/<span\b[^>]*class="[^"]*chapternum[^"]*"[^>]*>([\s\S]*?)<\/span>/i) || [])[1]
-        || (body.match(/<li\b[^>]*data-num="([^"]+)"/i) || [])[1]
-        || link[2];
-      const title = cleanText(numbered);
+      const numbered = (match[2].match(/<span\b[^>]*class="[^"]*chapternum[^"]*"[^>]*>([\s\S]*?)<\/span>/i) || [])[1];
+      const behind = text.slice(Math.max(0, match.index - 600), match.index);
+      const dataNum = (behind.match(/<li\b[^>]*data-num="([^"]+)"[^>]*>(?!.*<li\b[^>]*data-num=)/is) || [])[1];
+      const title = cleanText(numbered || dataNum || match[2]);
       if (!title || hasUnsafeMarker(title)) continue;
       seen.add(href);
       entries.push({ href, title });
@@ -584,13 +612,19 @@
     if (chaptersCache.has(cacheKey)) return chaptersCache.get(cacheKey);
     const html = await requestHTML(ref.href);
     // The series page carries its complete chapter list: every kept row is
-    // returned oldest-first, never capped to a UI-sized window.
-    const collected = parseChapterEntries(html, ref.href).map((entry) => ({
+    // returned oldest-first, never capped to a UI-sized window. The series
+    // cover rides along on each chapter so "Continue Reading" and library
+    // screens can always display it.
+    const cover = coverImage(html, ref.href);
+    const collected = parseChapterEntries(html, ref.href, ref.id).map((entry) => ({
       id: chapterID(entry.href),
       href: entry.href,
       url: entry.href,
       title: entry.title,
       number: chapterNumber(entry.title),
+      image: cover,
+      cover,
+      coverUrl: cover,
     }));
     collected.sort((a, b) => {
       if (a.number !== null && b.number !== null && a.number !== b.number) return a.number - b.number;

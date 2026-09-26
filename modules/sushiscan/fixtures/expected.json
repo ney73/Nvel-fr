@@ -24,6 +24,16 @@
             "cover": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
             "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureBorealCover.jpg",
             "language": "fr"
+          },
+          {
+            "id": "fixture-lazy",
+            "href": "https://sushiscan.net/catalogue/fixture-lazy/",
+            "url": "https://sushiscan.net/catalogue/fixture-lazy/",
+            "title": "Fixture Lazy",
+            "image": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
+            "cover": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
+            "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureLazyCover.jpg",
+            "language": "fr"
           }
         ]
       }
@@ -49,6 +59,16 @@
         "image": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
         "cover": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
         "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureCendreCover.jpg",
+        "language": "fr"
+      },
+      {
+        "id": "fixture-recueil",
+        "href": "https://sushiscan.net/catalogue/fixture-recueil/",
+        "url": "https://sushiscan.net/catalogue/fixture-recueil/",
+        "title": "Fixture Recueil",
+        "image": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
+        "cover": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
+        "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureRecueilCover.jpg",
         "language": "fr"
       }
     ],
@@ -81,28 +101,50 @@
       "href": "https://sushiscan.net/fixture-aurore-chapitre-1/",
       "url": "https://sushiscan.net/fixture-aurore-chapitre-1/",
       "title": "Chapitre 1",
-      "number": 1
+      "number": 1,
+      "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
     },
     {
       "id": "fixture-aurore-chapitre-2",
       "href": "https://sushiscan.net/fixture-aurore-chapitre-2/",
       "url": "https://sushiscan.net/fixture-aurore-chapitre-2/",
       "title": "Chapitre 2",
-      "number": 2
+      "number": 2,
+      "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
     },
     {
       "id": "fixture-aurore-volume-2",
       "href": "https://sushiscan.net/fixture-aurore-volume-2/",
       "url": "https://sushiscan.net/fixture-aurore-volume-2/",
       "title": "Vol. 2",
-      "number": 2
+      "number": 2,
+      "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
     },
     {
       "id": "fixture-aurore-chapitre-3",
       "href": "https://sushiscan.net/fixture-aurore-chapitre-3/",
       "url": "https://sushiscan.net/fixture-aurore-chapitre-3/",
       "title": "Chapitre 3",
-      "number": 3
+      "number": 3,
+      "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
+    },
+    {
+      "id": "fixture-aurore-chapitre-4",
+      "href": "https://sushiscan.net/fixture-aurore-chapitre-4/",
+      "url": "https://sushiscan.net/fixture-aurore-chapitre-4/",
+      "title": "Chapitre 4",
+      "number": 4,
+      "image": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "cover": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg",
+      "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureAuroreCover.jpg"
     }
   ],
   "images": [

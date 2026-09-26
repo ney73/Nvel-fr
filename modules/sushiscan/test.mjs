@@ -79,27 +79,40 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
       assert.equal(item.coverUrl, item.cover, "cover alias must match");
     }
   }
-  // Unsafe titles and duplicates never reach the catalogue.
+  // Unsafe titles and duplicates never reach the catalogue; lazy-only
+  // covers resolve through their data attributes.
   assert.deepEqual(
     plain((await module.discoveryHome()).sections[0].items.map(({ id }) => ({ id }))),
-    [{ id: "fixture-aurore" }, { id: "fixture-boreal" }],
+    [{ id: "fixture-aurore" }, { id: "fixture-boreal" }, { id: "fixture-lazy" }],
   );
   assert.deepEqual(plain((await module.discoveryFeed("catalogue", 1)).items), expected.discovery.sections[0].items);
   assert.deepEqual(plain(await module.searchResults("fixture", 1)), expected.search);
+  // Listing labels ("Manga …", "Artbook …", trailing chapter refs) are
+  // stripped back to the bare series title.
   assert.deepEqual(
-    plain((await module.searchResults("FIXTURE", 1)).items.map(({ id }) => ({ id }))),
-    [{ id: "fixture-aurore" }, { id: "fixture-cendre" }],
+    plain((await module.searchResults("FIXTURE", 1)).items.map(({ id, title }) => ({ id, title }))),
+    [
+      { id: "fixture-aurore", title: "Fixture Aurore" },
+      { id: "fixture-cendre", title: "Fixture Cendre" },
+      { id: "fixture-recueil", title: "Fixture Recueil" },
+    ],
   );
   assert.deepEqual(plain(await module.extractDetails("fixture-aurore")), expected.details);
   assert.deepEqual(
     plain(await module.extractDetails("https://sushiscan.net/catalogue/fixture-aurore/")),
     expected.details,
   );
-  // The complete chapter list is never capped, stays oldest-first, and drops
-  // the unsafe entry.
+  // The complete chapter list is never capped, stays oldest-first, spans
+  // every container shape, drops foreign-series links plus the unsafe
+  // entry, and carries the series cover for library screens.
   const chapters = await module.extractChapters("fixture-aurore");
   assert.deepEqual(plain(chapters), expected.chapters);
   assert.ok(chapters.every((chapter) => chapter.url.startsWith("https://sushiscan.net/fixture-aurore-")));
+  assert.ok(chapters.every((chapter) => chapter.coverUrl === expected.details.cover));
+  assert.deepEqual(
+    plain(chapters.map(({ number }) => ({ number }))),
+    [{ number: 1 }, { number: 2 }, { number: 2 }, { number: 3 }, { number: 4 }],
+  );
   // Page images come from the embedded reader payload, in payload order,
   // foreign mirrors excluded.
   const images = await module.extractImages("fixture-aurore-chapitre-3");
