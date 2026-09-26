@@ -40,6 +40,7 @@ function router(fixtures) {
     );
     if (parsed.pathname === "/catalogue/fixture-aurore/") return response(fixtures.details);
     if (parsed.pathname === "/catalogue/fixture-boreal/") return response(fixtures.details);
+    if (parsed.pathname === "/catalogue/1-fixture-pref/") return response(fixtures.detailsPrefixed);
     if (parsed.pathname === "/fixture-aurore-chapitre-3/") return response(fixtures.chapter);
     if (parsed.pathname === "/fixture-aurore-chapitre-2/") return response(fixtures.chapterFallback);
     if (parsed.searchParams.has("s")) {
@@ -59,6 +60,7 @@ async function loadFixtures() {
     searchEmpty: await fixture("search-empty.html"),
     searchExcluded: await fixture("search-excluded.html"),
     details: await fixture("details.html"),
+    detailsPrefixed: await fixture("details-prefixed.html"),
     chapter: await fixture("chapter.html"),
     chapterFallback: await fixture("chapter-fallback.html"),
   };
@@ -80,10 +82,16 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
     }
   }
   // Unsafe titles and duplicates never reach the catalogue; lazy-only
-  // covers resolve through their data attributes.
+  // covers resolve through their data attributes; a badge-only card falls
+  // back to its slug instead of ever displaying "Manga".
   assert.deepEqual(
-    plain((await module.discoveryHome()).sections[0].items.map(({ id }) => ({ id }))),
-    [{ id: "fixture-aurore" }, { id: "fixture-boreal" }, { id: "fixture-lazy" }],
+    plain((await module.discoveryHome()).sections[0].items.map(({ id, title }) => ({ id, title }))),
+    [
+      { id: "fixture-aurore", title: "Fixture Aurore" },
+      { id: "fixture-boreal", title: "Fixture Boreal" },
+      { id: "fixture-badge", title: "Fixture Badge" },
+      { id: "fixture-lazy", title: "Fixture Lazy" },
+    ],
   );
   assert.deepEqual(plain((await module.discoveryFeed("catalogue", 1)).items), expected.discovery.sections[0].items);
   assert.deepEqual(plain(await module.searchResults("fixture", 1)), expected.search);
@@ -113,6 +121,17 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
     plain(chapters.map(({ number }) => ({ number }))),
     [{ number: 1 }, { number: 2 }, { number: 2 }, { number: 3 }, { number: 4 }],
   );
+  // Chapters whose catalogue slug carries a numeric prefix ("1-…")
+  // still own their unprefixed chapter URLs; foreign links stay out.
+  const prefixed = await module.extractChapters("1-fixture-pref");
+  assert.deepEqual(
+    plain(prefixed.map(({ id, title, number }) => ({ id, title, number }))),
+    [
+      { id: "fixture-pref-chapitre-1", title: "Chapitre 1", number: 1 },
+      { id: "fixture-pref-chapitre-2", title: "Chapitre 2", number: 2 },
+    ],
+  );
+  assert.ok(prefixed.every((chapter) => chapter.coverUrl.endsWith("/FixturePrefCover.jpg")));
   // Page images come from the embedded reader payload, in payload order,
   // foreign mirrors excluded.
   const images = await module.extractImages("fixture-aurore-chapitre-3");

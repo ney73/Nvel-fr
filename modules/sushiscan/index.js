@@ -264,6 +264,13 @@
         if (url) attributes.push(url);
       }
     }
+    const dataSrcset = imageTag.match(/\sdata-srcset=(["'])(.*?)\1/i);
+    if (dataSrcset) {
+      for (const candidate of dataSrcset[2].split(",")) {
+        const url = candidate.trim().split(/\s+/)[0];
+        if (url) attributes.push(url);
+      }
+    }
     const source = imageTag.match(/\ssrc=(["'])(.*?)\1/i);
     if (source) attributes.push(source[2]);
     for (const candidate of attributes) {
@@ -287,13 +294,48 @@
     return title;
   }
 
+  const CATEGORY_WORD = /^(?:manga|manhwa|manhua|novel|webtoon|bd|comics?|artbook|fanbook)$/i;
+
+  function withoutBadges(inner) {
+    // Type badges ("Manga", "Manhwa"...) must never become the item title.
+    return String(inner || "")
+      .replace(/<span\b[^>]*class="[^"]*(?:typename|type|mtype)[^"]*"[^>]*>[\s\S]*?<\/span>/gi, " ");
+  }
+
+  function ttText(inner) {
+    const tt = String(inner || "").match(/<div\b[^>]*class="[^"]*\btt\b[^"]*"[^>]*>([\s\S]*?)<\/div>/i);
+    return tt ? cleanText(tt[1]) : "";
+  }
+
+  function tagAttribute(tag, name) {
+    const found = String(tag || "").match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
+    return found ? decodeEntities(found[2]).trim() : "";
+  }
+
+  function resolveTitle(entry, slug) {
+    // Explicit title sources first (anchor title attribute, .tt block, image
+    // alt text), raw anchor text last. A bare category word is never a
+    // title: the chain falls through to the humanized slug instead.
+    const candidates = [
+      entry.titleAttr,
+      ttText(entry.inner),
+      cleanSeriesTitle(withoutBadges(entry.inner)),
+      entry.imgAlt,
+    ];
+    for (const candidate of candidates) {
+      const title = cleanSeriesTitle(candidate);
+      if (title && !CATEGORY_WORD.test(title) && !hasUnsafeMarker(title)) return title;
+    }
+    const fallback = humanizeSlug(slug);
+    return fallback && !CATEGORY_WORD.test(fallback) ? fallback : "";
+  }
+
   function safeItem(entry) {
     if (!entry || typeof entry !== "object") return null;
     try {
       const ref = parseSeriesRef(absoluteURL(entry.href) || "");
       if (!ref) return null;
-      let title = cleanSeriesTitle(entry.title);
-      if (!title) title = humanizeSlug(ref.id);
+      const title = resolveTitle(entry, ref.id);
       if (!title || hasUnsafeMarker(title)) return null;
       const image = entry.image || "";
       if (image && hasUnsafeMarker(image)) return null;
@@ -325,18 +367,27 @@
     while ((match = pattern.exec(text)) !== null) {
       const href = absoluteURL(match[1], pageURL);
       if (!href || !parseSeriesRef(href)) continue;
-      let image = coverFromVicinity((match[2].match(/<img\b[^>]*>/i) || [])[0] || "", pageURL);
+      const openTag = (match[0].match(/^<a\b[^>]*>/i) || [])[0] || "";
+      const innerImage = (match[2].match(/<img\b[^>]*>/i) || [])[0] || "";
+      let imageTag = innerImage;
+      let image = coverFromVicinity(imageTag, pageURL);
       if (!image) {
         const behind = text.slice(Math.max(0, match.index - 1200), match.index);
         const tags = [...behind.matchAll(/<img\b[^>]*>/gi)];
-        for (let index = tags.length - 1; index >= 0; index -= 1) {
+        for (let index = tags.length - 1; index >= 0 && !image; index -= 1) {
           const gap = behind.slice((tags[index].index || 0) + tags[index][0].length);
           if (/\/catalogue\/[^/"]+\/?["']/i.test(gap)) continue;
-          image = coverFromVicinity(tags[index][0], pageURL);
-          if (image) break;
+          imageTag = tags[index][0];
+          image = coverFromVicinity(imageTag, pageURL);
         }
       }
-      const item = safeItem({ title: match[2], href, image });
+      const item = safeItem({
+        inner: match[2],
+        titleAttr: tagAttribute(openTag, "title"),
+        imgAlt: tagAttribute(imageTag, "alt") || tagAttribute(imageTag, "title"),
+        href,
+        image,
+      });
       if (!item || seen.has(item.id)) continue;
       seen.add(item.id);
       items.push(item);
@@ -568,14 +619,20 @@
     return Number.isFinite(value) ? value : null;
   }
 
+  function escapeRegExp(value) {
+    return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   function parseChapterEntries(html, pageURL, seriesSlug) {
     // Container-independent: chapter anchors are collected wherever they
     // render (#chapterlist, .eplister, .clstyle rows, collapsible volumes).
-    // Ownership is enforced on the URL itself — only "{seriesSlug}-chapitre-"
-    // / "-volume-" targets are kept, so related-series sidebars can never
-    // leak foreign chapters into this series.
+    // Ownership is enforced on the URL itself. Catalogue slugs sometimes
+    // carry a numeric disambiguation prefix ("1-blue-lock") that chapter
+    // URLs drop ("blue-lock-chapitre-345"), so both shapes own chapters.
+    // Anything else (related-series sidebars, foreign mirrors) is rejected.
     const text = String(html || "");
-    const owned = new RegExp(`^/${seriesSlug}-(chapitre|volume)-\\d+(?:-\\d+)?/?$`, "i");
+    const bases = [...new Set([seriesSlug, seriesSlug.replace(/^\d+-/, "")])].map(escapeRegExp);
+    const owned = new RegExp(`^/(${bases.join("|")})-(chapitre|volume)-\\d+(?:-\\d+)?/?$`, "i");
     const entries = [];
     const seen = new Set();
     const pattern = /<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;

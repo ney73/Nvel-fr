@@ -26,6 +26,16 @@
             "language": "fr"
           },
           {
+            "id": "fixture-badge",
+            "href": "https://sushiscan.net/catalogue/fixture-badge/",
+            "url": "https://sushiscan.net/catalogue/fixture-badge/",
+            "title": "Fixture Badge",
+            "image": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
+            "cover": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
+            "coverUrl": "https://sushiscan.net/wp-content/uploads/FixtureBadgeCover.jpg",
+            "language": "fr"
+          },
+          {
             "id": "fixture-lazy",
             "href": "https://sushiscan.net/catalogue/fixture-lazy/",
             "url": "https://sushiscan.net/catalogue/fixture-lazy/",
