@@ -15,6 +15,9 @@
     },
     "anime-sama-v1": {
       "chapterScope": "api"
+    },
+    "j-garden-v1": {
+      "chapterScope": "selected-series-dom"
     }
   }
 }

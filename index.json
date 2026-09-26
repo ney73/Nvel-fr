@@ -96,6 +96,25 @@
         "path": "modules/anime-sama/icon.png",
         "sha256": "30ea661577447c6dbaa5f37120d477a5be5822da2c02cf3c07f5d56655628e21"
       }
+    },
+    {
+      "id": "j-garden-v1",
+      "familyID": "j-garden-v1",
+      "name": "JGarden",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "publication",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/j-garden/manifest.json",
+        "sha256": "644fbd5fdc2934bb43a8a4bdd4ee6ef334d51bd1708071ecd56ec124f7e189bc"
+      },
+      "icon": {
+        "path": "modules/j-garden/icon.png",
+        "sha256": "055595a1c463589c795e59ed30131f264fd98f521bce072da702d0538dbc5efe"
+      }
     }
   ],
   "repository": {
