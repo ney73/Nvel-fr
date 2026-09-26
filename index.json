@@ -98,22 +98,22 @@
       }
     },
     {
-      "id": "j-garden-v1",
-      "familyID": "j-garden-v1",
-      "name": "JGarden",
-      "version": "0.1.1",
+      "id": "scan-manga-v1",
+      "familyID": "scan-manga-v1",
+      "name": "Scan-Manga",
+      "version": "0.1.0",
       "language": "fr",
-      "contentType": "publication",
+      "contentType": "pageImages",
       "contentRating": "suggestive",
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/j-garden/manifest.json",
-        "sha256": "68526bbf9944f03a7462509a9a3757a0746978fc7161cadafea0f14903b4c1b6"
+        "path": "modules/scan-manga/manifest.json",
+        "sha256": "3af6909175b642e8fb09c370541d64c2bc2ba4951239812729d1b7f1de5cf58d"
       },
       "icon": {
-        "path": "modules/j-garden/icon.png",
-        "sha256": "055595a1c463589c795e59ed30131f264fd98f521bce072da702d0538dbc5efe"
+        "path": "modules/scan-manga/icon.png",
+        "sha256": "1c9887719d3097ca597788cb26eb6743bb6964892c0b37b05321ecc41d8b8a9b"
       }
     }
   ],
