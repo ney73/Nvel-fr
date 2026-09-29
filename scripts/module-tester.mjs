@@ -341,9 +341,10 @@ if (slug === "novelfire") {
           // pages. Resolve most-specific routes first, mirroring other API
           // modules so the generic fixture runner exercises the same contract.
           const flightDetails = await fixture("details.rsc");
-          const flightChapters = await fixture("chapters.rsc");
+          const flightChapters = (await fixture("chapters.rsc")) || (await fixture("chapters.json"));
           const flightPages = await fixture("pages.rsc");
           const flightHome = await fixture("home.rsc") || search;
+          if (/\/api\/manga\/[^/]+\/[0-9.]+/i.test(u) && flightChapters) return fixtureResponse(flightChapters);
           if (/\/api\/manga\/lastchapters/i.test(u) && flightHome) return fixtureResponse(flightHome);
           if (/\/api\/search/i.test(u) && search) return fixtureResponse(search);
           if (/\/chapter\/[0-9.]+/.test(u) && flightPages) return fixtureResponse(flightPages);

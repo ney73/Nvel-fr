@@ -790,6 +790,7 @@ test("Poseidon Scans parses search, flight-data details, free-only chapters, and
   const fixtures = {
     search: await text("modules/poseidon-scans/fixtures/search.json"),
     details: await text("modules/poseidon-scans/fixtures/details.rsc"),
+    chapters: await text("modules/poseidon-scans/fixtures/chapters.json"),
     pages: await text("modules/poseidon-scans/fixtures/pages.rsc"),
     expected: await json("modules/poseidon-scans/fixtures/expected.json"),
   };
@@ -799,6 +800,7 @@ test("Poseidon Scans parses search, flight-data details, free-only chapters, and
       assert.equal(typeof url, "string");
       if (url.includes("/api/search")) return response(fixtures.search);
       if (url.includes("/api/manga/lastchapters")) return response(fixtures.search);
+      if (/\/api\/manga\/[^/]+\/\d+/.test(url)) return response(fixtures.chapters);
       if (url.includes("/chapter/")) {
         chapterCalls += 1;
         assert.equal(options.maxBytesHint, 16 * 1024 * 1024, "chapter page uses the manifest response ceiling");

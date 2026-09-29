@@ -101,7 +101,7 @@
       "id": "sushiscan-v1",
       "familyID": "sushiscan-v1",
       "name": "Sushi Scan",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "language": "fr",
       "contentType": "pageImages",
       "contentRating": "suggestive",
@@ -109,11 +109,30 @@
       "status": "active",
       "manifest": {
         "path": "modules/sushiscan/manifest.json",
-        "sha256": "9b7b1ac12e7bd7142d332e1c774a9c5b938d0f52f8ebf146363e4fdf5ac664d7"
+        "sha256": "1f34de8cd67eba9086bdb6b580dc67c3aff76a4155db99ba0ff301450f4d4e4a"
       },
       "icon": {
         "path": "modules/sushiscan/icon.png",
         "sha256": "5a6242dd1e359503cf6ee90823fef9f82da486ad28c0877bec0f4965db0ab3bf"
+      }
+    },
+    {
+      "id": "poseidon-scans-v1",
+      "familyID": "poseidon-scans-v1",
+      "name": "Poseidon Scans",
+      "version": "0.1.0",
+      "language": "fr",
+      "contentType": "pageImages",
+      "contentRating": "suggestive",
+      "releaseTrack": "beta",
+      "status": "active",
+      "manifest": {
+        "path": "modules/poseidon-scans/manifest.json",
+        "sha256": "b75990ccfd6d2018416c955c8042b4df425b4bd9256c84dfbdcd4a4c69e17100"
+      },
+      "icon": {
+        "path": "modules/poseidon-scans/icon.png",
+        "sha256": "b96f39ac6c99750f67a0f6042421f69de0b4206617a71b9ac941bd2dacd10be6"
       }
     }
   ],

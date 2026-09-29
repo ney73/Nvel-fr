@@ -248,12 +248,13 @@
 
   function coverFromVicinity(imageTag, pageURL) {
     if (!imageTag) return "";
-    // Covers are often lazy-loaded: data-original / data-lazy-src / data-src
-    // carry the real file while src holds a placeholder (or nothing), and
-    // srcset lists candidates. The first usable source-hosted file wins;
-    // placeholders never count as covers.
+    // Covers are lazy-loaded: data-* attributes carry the real file while
+    // src holds a placeholder (or nothing). Priority: data-src,
+    // data-lazy-src, data-original (observed on this source), data-cfsrc,
+    // then srcset / data-srcset (first URL), then src. The first usable
+    // source-hosted file wins; placeholders never count as covers.
     const attributes = [];
-    for (const name of ["data-original", "data-lazy-src", "data-src"]) {
+    for (const name of ["data-src", "data-lazy-src", "data-original", "data-cfsrc"]) {
       const found = imageTag.match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
       if (found) attributes.push(found[2]);
     }
@@ -341,8 +342,9 @@
       if (!title || hasUnsafeMarker(title)) return null;
       const image = entry.image || "";
       if (image && hasUnsafeMarker(image)) return null;
-      // "poster" duplicates the cover under the other name reader apps and
-      // library screens look up. Every URL here is absolute HTTPS.
+      // "poster"/"posterImage" duplicate the cover under the other names
+      // reader apps and library screens look up. Every URL here is absolute
+      // HTTPS.
       return {
         id: ref.id,
         href: ref.href,
@@ -352,6 +354,7 @@
         cover: image,
         coverUrl: image,
         poster: image,
+        posterImage: image,
         language: "fr",
       };
     } catch (_) {
@@ -593,6 +596,7 @@
       cover: image,
       coverUrl: image,
       poster: image,
+      posterImage: image,
       author,
       authors,
       genres,
@@ -722,6 +726,7 @@
       cover,
       coverUrl: cover,
       poster: cover,
+      posterImage: cover,
       manga,
     }));
     collected.sort((a, b) => {

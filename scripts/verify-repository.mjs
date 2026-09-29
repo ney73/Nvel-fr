@@ -12,6 +12,7 @@ const expectedHandlers = {
   "novelneko-wn": ["searchResults", "extractDetails", "extractChapters", "extractText"],
   "novelneko-ln": ["searchResults", "extractDetails", "extractResources"],
   "sushiscan": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
+  "poseidon-scans": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   "anime-sama": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   lnori: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   witchculttranslation: ["searchResults", "extractDetails", "extractChapters", "extractText"],

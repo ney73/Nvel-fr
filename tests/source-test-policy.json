@@ -18,6 +18,14 @@
     },
     "sushiscan-v1": {
       "chapterScope": "selected-series-dom"
+    },
+    "poseidon-scans-v1": {
+      "chapterScope": "api",
+      "requiredCodeFragments": [
+        "premiumFromSeriesHTML",
+        "premiumFromLastChapters",
+        "chapterList"
+      ]
     }
   }
 }

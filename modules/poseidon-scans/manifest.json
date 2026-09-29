@@ -1,13 +1,12 @@
 {
   "allowedHosts": [
-    "sushiscan.net",
-    "*.sushiscan.net"
+    "poseidon-scans.net"
   ],
   "attribution": {
     "author": "Synthetiq-HQ",
-    "website": "https://sushiscan.net"
+    "website": "https://poseidon-scans.net"
   },
-  "baseURL": "https://sushiscan.net",
+  "baseURL": "https://poseidon-scans.net",
   "capabilities": [
     "search",
     "details",
@@ -19,28 +18,28 @@
   "contentType": "pageImages",
   "contractVersion": 1,
   "entry": {
-    "path": "modules/sushiscan/index.js",
-    "sha256": "02654facaf0245343983a2e18ee4d5808a0cbd1819e94a6b7c76000e930aa5b2"
+    "path": "modules/poseidon-scans/index.js",
+    "sha256": "0c56eb2e2a29a8d4b2db3d6e603a120c1fcad42d1456ec72585f921e6fcbf641"
   },
-  "familyID": "sushiscan-v1",
+  "familyID": "poseidon-scans-v1",
   "icon": {
-    "path": "modules/sushiscan/icon.png",
-    "sha256": "5a6242dd1e359503cf6ee90823fef9f82da486ad28c0877bec0f4965db0ab3bf"
+    "path": "modules/poseidon-scans/icon.png",
+    "sha256": "b96f39ac6c99750f67a0f6042421f69de0b4206617a71b9ac941bd2dacd10be6"
   },
-  "id": "sushiscan-v1",
+  "id": "poseidon-scans-v1",
   "language": "fr",
   "legacyIDs": [],
   "limits": {
     "cacheTTLSeconds": 900,
     "maxConcurrentRequests": 2,
-    "maxResponseBytes": 4194304,
+    "maxResponseBytes": 16777216,
     "maxScriptBytes": 524288,
     "timeoutMilliseconds": 30000
   },
   "minimumAppVersion": "1.0.0",
-  "name": "Sushi Scan",
+  "name": "Poseidon Scans",
   "releaseTrack": "beta",
   "status": "active",
-  "universalLink": "https://sushiscan.net",
-  "version": "0.1.6"
+  "universalLink": "https://poseidon-scans.net",
+  "version": "0.1.0"
 }

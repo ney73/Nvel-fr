@@ -162,15 +162,18 @@ for (const target of [chapters[0], chapters[Math.floor(chapters.length / 2)], ch
   await pause(300);
 }
 
-// 6. Regression case for oversized source scans reported by the owner.
-const marriedSearch = await module.searchResults("More Than a Married Couple, But Not Lovers", 1);
-const married = marriedSearch.items.find((item) => item.id.includes("/fuufu-ijou-koibito-miman-3939"));
-assert.ok(married, "More Than a Married Couple, But Not Lovers should be discoverable");
+// 6. Regression case for oversized source scans reported by the owner. The
+// series is catalogued under its romaji title ("Fuufu Ijou Koibito Miman.",
+// slug fuufu-ijou-koibito-miman): the English-title query no longer ranks it,
+// so the proof searches the title the site actually answers.
+const marriedSearch = await module.searchResults("Fuufu Ijou Koibito Miman", 1);
+const married = marriedSearch.items.find((item) => item.id.includes("/fuufu-ijou-koibito-miman"));
+assert.ok(married, "Fuufu Ijou Koibito Miman should be discoverable");
 const marriedChapters = await module.extractChapters(married.id);
 const marriedChapter43 = marriedChapters.find((chapter) => chapter.number === 43);
-assert.ok(marriedChapter43, "More Than a Married Couple, But Not Lovers chapter 43 should be listed");
+assert.ok(marriedChapter43, "Fuufu Ijou Koibito Miman chapter 43 should be listed");
 const marriedPages = await module.extractImages(marriedChapter43.id);
-const marriedProbe = await probeImages(marriedPages, "More Than a Married Couple, But Not Lovers chapter 43");
-console.log(`More Than a Married Couple, But Not Lovers chapter 43: ${marriedProbe.pages} pages, max ${marriedProbe.maxBytes} bytes, slowest ${marriedProbe.slowestMs}ms`);
+const marriedProbe = await probeImages(marriedPages, "Fuufu Ijou Koibito Miman chapter 43");
+console.log(`Fuufu Ijou Koibito Miman chapter 43: ${marriedProbe.pages} pages, max ${marriedProbe.maxBytes} bytes, slowest ${marriedProbe.slowestMs}ms`);
 
 console.log("Poseidon Scans live proof: PASS (discovery + search + details + chapters + bounded full-page downloads)");

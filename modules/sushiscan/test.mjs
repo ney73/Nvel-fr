@@ -120,6 +120,7 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   // Library screens get the cover under every alias plus a nested manga
   // object carrying the parent cover.
   assert.ok(chapters.every((chapter) => chapter.poster === expected.details.cover));
+  assert.ok(chapters.every((chapter) => chapter.posterImage === expected.details.cover));
   assert.deepEqual(plain(chapters[0].manga), {
     id: expected.details.id,
     href: expected.details.href,
