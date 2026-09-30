@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Invented minimal fixture modeled on the observed sitemap shape. No real catalogue data. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>https://www.mugiwara-no-streaming.com/</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/populaires</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-boreal</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-interdit</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore/episodes/saison1</loc></url>
+<url><loc>https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore/scans/original</loc></url>
+</urlset>

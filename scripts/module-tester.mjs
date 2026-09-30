@@ -341,15 +341,28 @@ if (slug === "novelfire") {
           // pages. Resolve most-specific routes first, mirroring other API
           // modules so the generic fixture runner exercises the same contract.
           const flightDetails = await fixture("details.rsc");
-          const flightChapters = (await fixture("chapters.rsc")) || (await fixture("chapters.json"));
+          const flightChapters = await fixture("chapters.rsc");
           const flightPages = await fixture("pages.rsc");
           const flightHome = await fixture("home.rsc") || search;
-          if (/\/api\/manga\/[^/]+\/[0-9.]+/i.test(u) && flightChapters) return fixtureResponse(flightChapters);
           if (/\/api\/manga\/lastchapters/i.test(u) && flightHome) return fixtureResponse(flightHome);
           if (/\/api\/search/i.test(u) && search) return fixtureResponse(search);
           if (/\/chapter\/[0-9.]+/.test(u) && flightPages) return fixtureResponse(flightPages);
           if (/\/serie\//i.test(u) && flightDetails) return fixtureResponse(flightDetails);
           if (flightHome) return fixtureResponse(flightHome);
+        }
+        if (slug === "mugiwara-no-streaming") {
+          // Mugiwara No Scans: /sitemap.xml for the catalogue (discovery +
+          // search), /catalogue/<slug> (flight-data title page) for details,
+          // and /api/taille-proxy for the chapter map. Page images are pure
+          // URL constructions on the scans host, so no chapter-page fixture
+          // is needed. Most-specific routes first.
+          const sitemap = await fixture("sitemap.xml");
+          const titleHTML = await fixture("details.html");
+          const taille = await fixture("chapters.json");
+          if (/\/api\/taille-proxy/i.test(u) && taille) return fixtureResponse(taille);
+          if (/\/sitemap\.xml/i.test(u) && sitemap) return fixtureResponse(sitemap);
+          if (/\/catalogue\/[^/]+\/?$/i.test(u) && titleHTML) return fixtureResponse(titleHTML);
+          if (home) return fixtureResponse(home);
         }
         if (slug === "mangaworld") {
           if (/\/read\/[0-9a-f]+/.test(u) && chapter) return fixtureResponse(chapter);

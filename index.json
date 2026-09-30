@@ -117,9 +117,9 @@
       }
     },
     {
-      "id": "poseidon-scans-v1",
-      "familyID": "poseidon-scans-v1",
-      "name": "Poseidon Scans",
+      "id": "mugiwara-no-streaming-v1",
+      "familyID": "mugiwara-no-streaming-v1",
+      "name": "Mugiwara No Scans",
       "version": "0.1.0",
       "language": "fr",
       "contentType": "pageImages",
@@ -127,12 +127,12 @@
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/poseidon-scans/manifest.json",
-        "sha256": "b75990ccfd6d2018416c955c8042b4df425b4bd9256c84dfbdcd4a4c69e17100"
+        "path": "modules/mugiwara-no-streaming/manifest.json",
+        "sha256": "c7e6d2f143a2d4c84771d3c7589af8c14d6c83630e7b2a77b680ab77c90cf71b"
       },
       "icon": {
-        "path": "modules/poseidon-scans/icon.png",
-        "sha256": "b96f39ac6c99750f67a0f6042421f69de0b4206617a71b9ac941bd2dacd10be6"
+        "path": "modules/mugiwara-no-streaming/icon.png",
+        "sha256": "ee773dc94ec0921b6d401ed58a76d10385c6cb7e9fb728a9ccceab9f731f59b6"
       }
     }
   ],
