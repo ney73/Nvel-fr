@@ -49,6 +49,7 @@ function router(fixtures) {
     }
     if (parsed.pathname === "/catalogue/fixture-boreal") return response(fixtures.detailsAnime);
     if (parsed.pathname === "/catalogue/fixture-interdit") return response(fixtures.detailsAdult);
+    if (parsed.pathname === "/catalogue/fixture-versions") return response(fixtures.detailsVersions);
     if (parsed.pathname === "/catalogue/fixture-unknown") return response("Not Found", 404);
     throw new Error(`Unexpected URL: ${url}`);
   };
@@ -60,6 +61,7 @@ async function loadFixtures() {
     details: await fixture("details.html"),
     detailsAnime: await fixture("details-anime.html"),
     detailsAdult: await fixture("details-adult.html"),
+    detailsVersions: await fixture("details-versions.html"),
     chapters: await fixture("chapters.json"),
   };
 }
@@ -105,8 +107,10 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
     expected.details,
     "bare slugs resolve too",
   );
-  // Anime-only works are excluded with a clear message.
+  // Anime-only works are excluded with a clear message, and their chapter
+  // list degrades to a clean empty array instead of failing the screen.
   await assert.rejects(() => module.extractDetails("fixture-boreal"), /no scan version/i);
+  assert.deepEqual(plain(await module.extractChapters("fixture-boreal")), []);
   // Server-flagged adult titles are rejected, never listed for reading.
   await assert.rejects(() => module.extractDetails("fixture-interdit"), /adult-only/i);
   // The taille-proxy map yields the complete chapter list, oldest-first,
@@ -126,6 +130,22 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
     title: expected.details.title,
     cover: expected.details.cover,
   });
+  // A series with spin-off versions[] uses its own top-level token: the
+  // taille map is requested with the main IMAGE_URL, never the spin-off's.
+  const tailleSlugs = [];
+  const versionsModule = await load(async (url, headers, method, body, options) => {
+    if (new URL(url).pathname === "/api/taille-proxy") {
+      tailleSlugs.push(new URL(url).searchParams.get("slug"));
+    }
+    return router(fixtures)(url, headers, method, body, options);
+  });
+  const versionChapters = await versionsModule.extractChapters("fixture-versions");
+  assert.deepEqual(
+    plain(versionChapters.map(({ number }) => ({ number }))),
+    [{ number: 1 }, { number: 2 }, { number: 3 }, { number: 4 }, { number: 5 }],
+  );
+  assert.ok(versionChapters.every((chapter) => chapter.id.includes("/catalogue/fixture-versions/scans/")));
+  assert.deepEqual(tailleSlugs, ["FixtureAurore"]);
   // Page images follow the scans host pattern in order, with the scans page
   // as Referer.
   const images = await module.extractImages(chapters[0].id);

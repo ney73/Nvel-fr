@@ -21,7 +21,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/mugiwara-scan/index.js",
-    "sha256": "e58da387d3626c0bb09e30b064a46661a3fe0f63c41d8d7ec409863693db32e6"
+    "sha256": "c542ded2367fd666e88e16a17b0cc485cb4c71c4f14bdd170e085d4662258d30"
   },
   "familyID": "mugiwara-scan",
   "icon": {

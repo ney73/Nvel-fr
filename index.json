@@ -128,7 +128,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/mugiwara-scan/manifest.json",
-        "sha256": "3df7d8b710c3ed9c0209d69b0bafafb8ac5192b17b02b5f7007e5f6a9c8a48c1"
+        "sha256": "a9c484e9e44dd7034054384968272b2854240488b1d9c8b168ec1655c782f6dd"
       },
       "icon": {
         "path": "modules/mugiwara-scan/icon.png",

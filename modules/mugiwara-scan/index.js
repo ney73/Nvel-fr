@@ -20,6 +20,9 @@
 //   availability, are excluded with a clear message.
 // - chapters: GET /api/taille-proxy?slug=<IMAGE_URL> answers the COMPLETE
 //   chapter map {"<number>":<pages>,...} in one response (no pagination).
+//   The token is the top-level SCANS_OPTIONS.IMAGE_URL (nested versions[]
+//   tokens address spin-offs and never win). Anime/streaming-only entries
+//   yield a clean empty chapter list instead of an error.
 // - images: https://scans.mugiwara-no-streaming.com/<IMAGE_URL>/<chap>/<page>.jpg
 //   (verified live: HTTP 200 image/jpeg), Referer set to the scans page.
 (() => {
@@ -386,6 +389,82 @@
     return String(html || "").replace(/\\"/g, '"');
   }
 
+  function balancedBlock(text, start) {
+    // Extracts the {...} block starting at start, respecting strings and
+    // escapes. Returns null on malformed input instead of guessing.
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let index = start; index < text.length; index += 1) {
+      const char = text[index];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (char === "\\") escaped = true;
+        else if (char === '"') inString = false;
+      } else if (char === '"') {
+        inString = true;
+      } else if (char === "{") {
+        depth += 1;
+      } else if (char === "}") {
+        depth -= 1;
+        if (depth === 0) return text.slice(start, index + 1);
+      }
+    }
+    return null;
+  }
+
+  function stripVersionsArray(block) {
+    // Removes the "versions":[...] spin-off array so nested IMAGE_URL tokens
+    // can never shadow the series' own top-level SCANS_OPTIONS.IMAGE_URL.
+    const key = block.indexOf('"versions"');
+    if (key < 0) return block;
+    const colon = block.indexOf(":", key);
+    if (colon < 0) return block;
+    const open = block.indexOf("[", colon);
+    if (open < 0) return block;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let index = open; index < block.length; index += 1) {
+      const char = block[index];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (char === "\\") escaped = true;
+        else if (char === '"') inString = false;
+      } else if (char === '"') {
+        inString = true;
+      } else if (char === "[") {
+        depth += 1;
+      } else if (char === "]") {
+        depth -= 1;
+        if (depth === 0) return block.slice(0, key) + block.slice(index + 1);
+      }
+    }
+    return block;
+  }
+
+  function scansOptionsImageURL(html) {
+    // The series' own token is the top-level SCANS_OPTIONS.IMAGE_URL (kept
+    // byte-exact: tokens may carry significant trailing spaces). Nested
+    // versions[] tokens address spin-offs and must not win.
+    const text = flightText(html);
+    const key = text.indexOf('"SCANS_OPTIONS"');
+    if (key < 0) return "";
+    const colon = text.indexOf(":", key);
+    if (colon < 0) return "";
+    const open = text.indexOf("{", colon);
+    if (open < 0) return "";
+    const block = balancedBlock(text, open);
+    if (!block) return "";
+    const match = stripVersionsArray(block).match(/"IMAGE_URL":"((?:[^"\\]|\\.)*)"/);
+    if (!match) return "";
+    try {
+      return JSON.parse(`"${match[1]}"`);
+    } catch (_) {
+      return "";
+    }
+  }
+
   function flightString(html, key) {
     // Flight payload: "key":"value" with possible \\ escapes inside.
     const pattern = new RegExp(`"${key}":"((?:[^"\\\\]|\\\\.)*)"`);
@@ -497,7 +576,7 @@
     if (hasUnsafeMarker(title)) throw permanent("Mugiwara No Scans title failed the safety filter.");
     // The server flags explicit works itself: never list or open them.
     if (flightFlag(html, "adult")) throw permanent("Mugiwara No Scans flags this title as adult-only.");
-    const imageURL = flightString(html, "IMAGE_URL");
+    const imageURL = scansOptionsImageURL(html);
     const disponibles = flightStringArray(html, "disponibles").map((value) => value.toLowerCase());
     const hasScans = disponibles.includes("scans") || disponibles.includes("scan");
     if (!imageURL || !hasScans) {
@@ -558,7 +637,20 @@
     const ref = titleRefFromID(id);
     const cacheKey = ref.slug;
     if (chaptersCache.has(cacheKey)) return chaptersCache.get(cacheKey);
-    const { html, title, imageURL } = await loadSeries(ref);
+    let series;
+    try {
+      series = await loadSeries(ref);
+    } catch (error) {
+      // Anime/streaming-only entries carry no scan chapters: return a clean
+      // empty list instead of failing the chapter screen. Every other
+      // failure (network, challenge, malformed) still throws.
+      if (error instanceof Error && /no scan version/i.test(error.message)) {
+        chaptersCache.set(cacheKey, []);
+        return [];
+      }
+      throw error;
+    }
+    const { html, title, imageURL } = series;
     const cover = parseCover(html, ref.href);
     // The taille-proxy answers the complete {chapter: pages} map at once.
     const payload = await requestJSON(tailleURL(imageURL));
