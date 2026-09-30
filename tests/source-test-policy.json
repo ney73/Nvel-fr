@@ -19,12 +19,13 @@
     "sushiscan-v1": {
       "chapterScope": "selected-series-dom"
     },
-    "mugiwara-no-streaming-v1": {
+    "mugiwara-scan": {
       "chapterScope": "api",
       "requiredCodeFragments": [
         "taille-proxy",
         "SCANS_OPTIONS",
-        "scans.mugiwara-no-streaming.com"
+        "scans.mugiwara-no-streaming.com",
+        "pickImageURL"
       ]
     }
   }

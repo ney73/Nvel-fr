@@ -350,7 +350,7 @@ if (slug === "novelfire") {
           if (/\/serie\//i.test(u) && flightDetails) return fixtureResponse(flightDetails);
           if (flightHome) return fixtureResponse(flightHome);
         }
-        if (slug === "mugiwara-no-streaming") {
+        if (slug === "mugiwara-scan") {
           // Mugiwara No Scans: /sitemap.xml for the catalogue (discovery +
           // search), /catalogue/<slug> (flight-data title page) for details,
           // and /api/taille-proxy for the chapter map. Page images are pure

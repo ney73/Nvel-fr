@@ -117,8 +117,8 @@
       }
     },
     {
-      "id": "mugiwara-no-streaming-v1",
-      "familyID": "mugiwara-no-streaming-v1",
+      "id": "mugiwara-scan",
+      "familyID": "mugiwara-scan",
       "name": "Mugiwara No Scans",
       "version": "0.1.0",
       "language": "fr",
@@ -127,11 +127,11 @@
       "releaseTrack": "beta",
       "status": "active",
       "manifest": {
-        "path": "modules/mugiwara-no-streaming/manifest.json",
-        "sha256": "c7e6d2f143a2d4c84771d3c7589af8c14d6c83630e7b2a77b680ab77c90cf71b"
+        "path": "modules/mugiwara-scan/manifest.json",
+        "sha256": "3df7d8b710c3ed9c0209d69b0bafafb8ac5192b17b02b5f7007e5f6a9c8a48c1"
       },
       "icon": {
-        "path": "modules/mugiwara-no-streaming/icon.png",
+        "path": "modules/mugiwara-scan/icon.png",
         "sha256": "ee773dc94ec0921b6d401ed58a76d10385c6cb7e9fb728a9ccceab9f731f59b6"
       }
     }

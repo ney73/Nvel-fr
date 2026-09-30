@@ -433,14 +433,42 @@
       .replace(/\s*[–—\-|｜]\s*Mugiwara-no Streaming.*$/i, "").trim();
   }
 
+  // Cover candidates from one <img> tag, best source first: data-src >
+  // data-lazy-src > data-cfsrc > srcset (first URL) > src. Placeholders
+  // (data:, base64, svg, gifs, lazy stubs) never count as covers, and only
+  // source-hosted files are returned. No CSS dimensions are forced: the raw
+  // file URL passes through untouched so the app never crops or stretches.
+  function pickImageURL(imageTag, pageURL) {
+    if (!imageTag) return "";
+    const candidates = [];
+    for (const name of ["data-src", "data-lazy-src", "data-cfsrc"]) {
+      const found = String(imageTag).match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
+      if (found) candidates.push(found[2]);
+    }
+    const srcset = String(imageTag).match(/\ssrcset=(["'])(.*?)\1/i);
+    if (srcset) {
+      const first = srcset[2].split(",")[0].trim().split(/\s+/)[0];
+      if (first) candidates.push(first);
+    }
+    const src = String(imageTag).match(/\ssrc=(["'])(.*?)\1/i);
+    if (src) candidates.push(src[2]);
+    for (const candidate of candidates) {
+      if (!candidate || /^\s*data:/i.test(candidate)) continue;
+      if (/base64|placeholder|\.gif(\?|#|$)/i.test(candidate)) continue;
+      if (/\.svg(\?|#|$)/i.test(candidate) && !/\/covers\/|\/Animes\//i.test(candidate)) continue;
+      const absolute = absoluteURL(candidate, pageURL);
+      if (absolute) return absolute;
+    }
+    return "";
+  }
+
   function parseCover(html, pageURL) {
     const fromMeta = absoluteURL(metaContent(html, "property", "og:image"), pageURL);
     if (fromMeta) return fromMeta;
     const text = String(html || "");
-    const preload = text.match(/imageSrcSet="(https:\/\/static\.mugiwara-no-streaming\.com[^"]*?)(?:\s\d+w|\s\d+x)?"/i)
-      || text.match(/<img\b[^>]*src="(https:\/\/static\.mugiwara-no-streaming\.com[^"]+?)"/i);
-    if (preload) {
-      const candidate = absoluteURL(preload[1].split(" ")[0], pageURL);
+    const images = [...text.matchAll(/<img\b[^>]*>/gi)];
+    for (const imageTag of images) {
+      const candidate = pickImageURL(imageTag[0], pageURL);
       if (candidate) return candidate;
     }
     return "";
@@ -485,9 +513,10 @@
     const { html, title } = await loadSeries(ref);
     const categories = flightStringArray(html, "category");
     const themes = flightStringArray(html, "themes");
-    const type = flightString(html, "type");
+    // NOTE: the "type" field is deliberately excluded: flight payloads reuse
+    // it for font preloads ("font/woff2"), which is not a genre.
     const genres = [];
-    for (const name of [...categories, ...themes, type]) {
+    for (const name of [...categories, ...themes]) {
       const label = cleanText(name);
       if (label && label.length <= 40 && !genres.includes(label)) genres.push(label);
     }
@@ -618,13 +647,14 @@
     if (!Number.isInteger(pageCount) || pageCount < 1 || pageCount > 500) {
       throw permanent("Mugiwara No Scans chapter has no page data.");
     }
-    // Image bodies are never fetched here: the app downloads them with the
-    // scans page as Referer.
+    // IMAGE_URL tokens may contain spaces ("Blue Lock Spin-off Nagi"):
+    // encode the segment so chapter and image URLs stay valid.
     const referer = scansURL(ref.slug);
+    const token = encodeURIComponent(imageURL);
     const output = [];
     for (let page = 1; page <= pageCount; page += 1) {
       output.push({
-        url: `https://${SCANS_HOST}/${imageURL}/${ref.number}/${page}.jpg`,
+        url: `https://${SCANS_HOST}/${token}/${ref.number}/${page}.jpg`,
         headers: { Referer: referer },
       });
     }

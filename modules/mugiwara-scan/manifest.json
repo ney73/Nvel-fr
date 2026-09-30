@@ -20,15 +20,15 @@
   "contentType": "pageImages",
   "contractVersion": 1,
   "entry": {
-    "path": "modules/mugiwara-no-streaming/index.js",
-    "sha256": "22ec502106a3517c63208b8f46aaa1e5ed9500947b0ba8d932b5e77f6972694d"
+    "path": "modules/mugiwara-scan/index.js",
+    "sha256": "e58da387d3626c0bb09e30b064a46661a3fe0f63c41d8d7ec409863693db32e6"
   },
-  "familyID": "mugiwara-no-streaming-v1",
+  "familyID": "mugiwara-scan",
   "icon": {
-    "path": "modules/mugiwara-no-streaming/icon.png",
+    "path": "modules/mugiwara-scan/icon.png",
     "sha256": "ee773dc94ec0921b6d401ed58a76d10385c6cb7e9fb728a9ccceab9f731f59b6"
   },
-  "id": "mugiwara-no-streaming-v1",
+  "id": "mugiwara-scan",
   "language": "fr",
   "legacyIDs": [],
   "limits": {

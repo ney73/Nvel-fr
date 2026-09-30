@@ -12,7 +12,7 @@ const expectedHandlers = {
   "novelneko-wn": ["searchResults", "extractDetails", "extractChapters", "extractText"],
   "novelneko-ln": ["searchResults", "extractDetails", "extractResources"],
   "sushiscan": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
-  "mugiwara-no-streaming": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
+  "mugiwara-scan": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   "anime-sama": ["searchResults", "extractDetails", "extractChapters", "extractImages"],
   lnori: ["searchResults", "extractDetails", "extractChapters", "extractText"],
   witchculttranslation: ["searchResults", "extractDetails", "extractChapters", "extractText"],
