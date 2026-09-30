@@ -366,6 +366,8 @@ if (slug === "novelfire") {
           if (/\/catalogue\/[^/]+\/?$/i.test(u) && titleHTML) {
             if (/\/catalogue\/fixture-boreal\/?$/i.test(u)) return fixtureResponse(titleAnime);
             if (/\/catalogue\/fixture-interdit\/?$/i.test(u)) return fixtureResponse(titleAdult);
+            const titleSecond = await fixture("details-second.html");
+            if (/\/catalogue\/fixture-aurore-second\/?$/i.test(u) && titleSecond) return fixtureResponse(titleSecond);
             return fixtureResponse(titleHTML);
           }
           if (home) return fixtureResponse(home);

@@ -21,7 +21,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/mugiwara-scan/index.js",
-    "sha256": "b5d3c953afdca8120e7c61c98e28a2eb2a68fcd1c799d1fce9b08da42238fc0c"
+    "sha256": "cbb7adc94db34389a647c5ee3a4bb877960faa67aa5b4f5ce601ad037844a410"
   },
   "familyID": "mugiwara-scan",
   "icon": {
@@ -43,5 +43,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://www.mugiwara-no-streaming.com",
-  "version": "0.1.2"
+  "version": "0.1.3"
 }

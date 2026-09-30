@@ -50,6 +50,8 @@ function router(fixtures) {
     if (parsed.pathname === "/catalogue/fixture-boreal") return response(fixtures.detailsAnime);
     if (parsed.pathname === "/catalogue/fixture-interdit") return response(fixtures.detailsAdult);
     if (parsed.pathname === "/catalogue/fixture-versions") return response(fixtures.detailsVersions);
+    if (parsed.pathname === "/catalogue/fixture-lazy") return response(fixtures.detailsLazy);
+    if (parsed.pathname === "/catalogue/fixture-aurore-second") return response(fixtures.detailsSecond);
     if (parsed.pathname === "/catalogue/fixture-unknown") return response("Not Found", 404);
     throw new Error(`Unexpected URL: ${url}`);
   };
@@ -62,6 +64,8 @@ async function loadFixtures() {
     detailsAnime: await fixture("details-anime.html"),
     detailsAdult: await fixture("details-adult.html"),
     detailsVersions: await fixture("details-versions.html"),
+    detailsLazy: await fixture("details-lazy.html"),
+    detailsSecond: await fixture("details-second.html"),
     chapters: await fixture("chapters.json"),
   };
 }
@@ -85,6 +89,7 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
     plain((await module.discoveryHome()).sections[0].items.map(({ id, title }) => ({ id, title }))),
     [
       { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore", title: "Fixture Aurore" },
+      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore-second", title: "Fixture Aurore Second" },
     ],
   );
   for (const item of (await module.discoveryHome()).sections[0].items) {
@@ -96,10 +101,19 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
     hasMore: false,
   });
   assert.deepEqual(plain(await module.searchResults("aurore", 1)), expected.search);
+  // An exact title always outranks a partial one sharing its words.
+  assert.deepEqual(
+    plain((await module.searchResults("Fixture Aurore", 1)).items.map(({ id, title }) => ({ id, title }))),
+    [
+      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore", title: "Fixture Aurore" },
+      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore-second", title: "Fixture Aurore Second" },
+    ],
+  );
   assert.deepEqual(
     plain((await module.searchResults("FIXTURE", 1)).items.map(({ id }) => ({ id }))),
     [
       { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore" },
+      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore-second" },
     ],
   );
   assert.deepEqual(plain(await module.extractDetails(expected.details.id)), expected.details);
@@ -147,6 +161,12 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
   );
   assert.ok(versionChapters.every((chapter) => chapter.id.includes("/catalogue/fixture-versions/scans/")));
   assert.deepEqual(tailleSlugs, ["FixtureAurore"]);
+  // Without og:image, the lazy-loaded data-src wins over the inline SVG
+  // placeholder and no dimensions are forced onto the raw file URL.
+  const lazy = await module.extractDetails("fixture-lazy");
+  assert.equal(lazy.title, "Fixture Lazy");
+  assert.equal(lazy.cover, "https://static.mugiwara-no-streaming.com/Animes/fixture-lazy/affiche.jpg");
+  assert.equal(lazy.coverUrl, lazy.cover);
   // Page images follow the scans host pattern in order, with the scans page
   // as Referer.
   const images = await module.extractImages(chapters[0].id);

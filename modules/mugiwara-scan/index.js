@@ -374,14 +374,27 @@
     try {
       const slugs = await loadCatalogueSlugs();
       const words = folded.split(" ").filter(Boolean);
-      const matched = [];
+      const scored = [];
       for (const slug of slugs) {
-        const title = humanizeSlug(slug);
-        const haystack = `${fold(title)} ${fold(slug)}`;
-        if (!words.every((word) => haystack.includes(word))) continue;
         if (!SLUG_PATTERN.test(slug)) continue;
-        matched.push(slug);
+        const title = humanizeSlug(slug);
+        const foldedTitle = fold(title);
+        const foldedSlug = fold(slug);
+        const haystack = `${foldedTitle} ${foldedSlug}`;
+        if (!words.every((word) => haystack.includes(word))) continue;
+        // Rank so an exact title always wins over a partial one: searching
+        // "vagabond" must surface "Vagabond" before "Kenshin le vagabond".
+        // Identity stays strictly per-card: every entry below is verified by
+        // opening its own title page, so an id/cover can never leak across
+        // cards.
+        const compact = folded.replace(/ /g, "");
+        let score = 2;
+        if (foldedTitle === folded || foldedSlug.replace(/ /g, "") === compact) score = 0;
+        else if (foldedTitle.startsWith(folded) || foldedSlug.startsWith(folded)) score = 1;
+        scored.push({ slug, score });
       }
+      scored.sort((a, b) => a.score - b.score);
+      const matched = scored.map((entry) => entry.slug);
       const requestedPage = Math.max(1, Number(page) || 1);
       const start = (requestedPage - 1) * PAGE_SIZE;
       const { window, hasMore } = { window: matched.slice(start, start + PAGE_SIZE), hasMore: start + PAGE_SIZE < matched.length };
@@ -531,28 +544,34 @@
   }
 
   // Cover candidates from one <img> tag, best source first: data-src >
-  // data-lazy-src > data-cfsrc > srcset (first URL) > src. Placeholders
-  // (data:, base64, svg, gifs, lazy stubs) never count as covers, and only
-  // source-hosted files are returned. No CSS dimensions are forced: the raw
-  // file URL passes through untouched so the app never crops or stretches.
+  // data-lazy-src > srcset (first URL) > src > inline background-image.
+  // Placeholders (data:, base64, svg, gifs, lazy stubs) never count as
+  // covers, and only source-hosted files are returned. No CSS dimensions
+  // are forced: the raw file URL passes through untouched so the app never
+  // crops or stretches.
   function pickImageURL(imageTag, pageURL) {
     if (!imageTag) return "";
+    const tag = String(imageTag);
     const candidates = [];
-    for (const name of ["data-src", "data-lazy-src", "data-cfsrc"]) {
-      const found = String(imageTag).match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
+    for (const name of ["data-src", "data-lazy-src"]) {
+      const found = tag.match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
       if (found) candidates.push(found[2]);
     }
-    const srcset = String(imageTag).match(/\ssrcset=(["'])(.*?)\1/i);
+    const srcset = tag.match(/\ssrcset=(["'])(.*?)\1/i);
     if (srcset) {
       const first = srcset[2].split(",")[0].trim().split(/\s+/)[0];
       if (first) candidates.push(first);
     }
-    const src = String(imageTag).match(/\ssrc=(["'])(.*?)\1/i);
+    const src = tag.match(/\ssrc=(["'])(.*?)\1/i);
     if (src) candidates.push(src[2]);
+    const style = tag.match(/\sstyle=(["'])(.*?)\1/i);
+    if (style) {
+      const background = style[2].match(/background-image\s*:\s*url\(\s*["']?([^"')]+)["']?\s*\)/i);
+      if (background) candidates.push(background[1]);
+    }
     for (const candidate of candidates) {
       if (!candidate || /^\s*data:/i.test(candidate)) continue;
-      if (/base64|placeholder|\.gif(\?|#|$)/i.test(candidate)) continue;
-      if (/\.svg(\?|#|$)/i.test(candidate) && !/\/covers\/|\/Animes\//i.test(candidate)) continue;
+      if (/base64|\.svg(\?|#|$)|\.gif(\?|#|$)|placeholder|lazy[_-]?(stub|blank|pixel)/i.test(candidate)) continue;
       const absolute = absoluteURL(candidate, pageURL);
       if (absolute) return absolute;
     }
