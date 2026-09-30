@@ -6,13 +6,15 @@
 // which covers the scans catalogue only. Observed data flow (fetchv2 only,
 // no browser state):
 // - catalogue: GET /sitemap.xml lists every /catalogue/<slug> title URL
-//   (deeper episode/scan URLs are filtered out). Slugs are clean romanized
-//   titles, so catalogue items carry a readable derived title and resolve
-//   their exact title/cover lazily when details are opened.
+//   (deeper episode/scan URLs are filtered out). Slugs pre-filter candidates;
+//   every listed entry is then verified by opening its title page, so
+//   discovery and search only ever surface scan-readable titles with their
+//   exact display title and real cover. Anime/streaming-only and adult
+//   titles are filtered out of lists (and rejected at details time).
 // - search: accent-insensitive client-side filter over the sitemap slugs
 //   (the site's own search box is a client component with no observed
 //   endpoint; /api/catalogue-filters answers HTTP 500 without a browser
-//   session, so it is not used).
+//   session, so it is not used), verified per match as above.
 // - details: GET /catalogue/<slug> (server-rendered: og:title, og:image,
 //   og:description plus a flight-data anime object with slug, title,
 //   synopsis, aliases, category/themes genres, the explicit adult flag and
@@ -259,28 +261,6 @@
     return ref;
   }
 
-  function safeCatalogueItem(slug) {
-    if (!slug || !SLUG_PATTERN.test(String(slug).toLowerCase())) return null;
-    const cleanSlug = String(slug).toLowerCase();
-    const title = humanizeSlug(cleanSlug);
-    if (!title || hasUnsafeMarker(title)) return null;
-    // Sitemap entries carry no exact title/cover: the readable slug words
-    // stand in until details resolve the exact display title and cover.
-    const href = titleURL(cleanSlug);
-    return {
-      id: href,
-      href,
-      url: href,
-      title,
-      image: "",
-      cover: "",
-      coverUrl: "",
-      poster: "",
-      posterImage: "",
-      language: "fr",
-    };
-  }
-
   function parseSitemapSlugs(xml) {
     // Catalogue titles only (/catalogue/<slug>): episode and scan subpages
     // are reader state, not catalogue items.
@@ -319,12 +299,44 @@
   function paginateSlugs(slugs, page) {
     const requestedPage = Math.max(1, Number(page) || 1);
     const start = (requestedPage - 1) * PAGE_SIZE;
+    return { window: slugs.slice(start, start + PAGE_SIZE), hasMore: start + PAGE_SIZE < slugs.length };
+  }
+
+  // Verifies one catalogue entry by opening its title page: exact display
+  // title, real cover, and scans availability. Anime/streaming-only and
+  // adult titles resolve to null so lists never carry them. One failure
+  // never fails the whole page.
+  async function verifiedItem(slug) {
+    let ref = null;
+    try {
+      ref = parseTitleRef(titleURL(slug));
+      if (!ref) return null;
+      const { html, title } = await loadSeries(ref);
+      const image = parseCover(html, ref.href);
+      return {
+        id: ref.href,
+        href: ref.href,
+        url: ref.href,
+        title,
+        image,
+        cover: image,
+        coverUrl: image,
+        poster: image,
+        posterImage: image,
+        language: "fr",
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function verifyWindow(slugs) {
     const items = [];
-    for (const slug of slugs.slice(start, start + PAGE_SIZE)) {
-      const item = safeCatalogueItem(slug);
+    for (const slug of slugs) {
+      const item = await verifiedItem(slug);
       if (item) items.push(item);
     }
-    return { items, hasMore: start + PAGE_SIZE < slugs.length };
+    return items;
   }
 
   function resolveFeed(feedID) {
@@ -337,15 +349,20 @@
   async function discoveryHome() {
     const slugs = await safeCatalogue();
     if (slugs.length === 0) return { sections: [] };
-    const first = paginateSlugs(slugs, 1);
-    return { sections: [{ id: "catalogue", title: FEEDS.catalogue.title, items: first.items }] };
+    const { window } = paginateSlugs(slugs, 1);
+    const items = await verifyWindow(window);
+    if (items.length === 0) return { sections: [] };
+    return { sections: [{ id: "catalogue", title: FEEDS.catalogue.title, items }] };
   }
 
   async function discoveryFeed(feedID, page = 1) {
     resolveFeed(feedID);
     const slugs = await safeCatalogue();
     if (slugs.length === 0) return { items: [], hasMore: false };
-    return paginateSlugs(slugs, page);
+    const { window, hasMore } = paginateSlugs(slugs, page);
+    // hasMore reflects the slug catalogue: later windows may still yield
+    // readable, covered entries after unverified ones are filtered out.
+    return { items: await verifyWindow(window), hasMore };
   }
 
   async function searchResults(query, page = 1) {
@@ -362,12 +379,13 @@
         const title = humanizeSlug(slug);
         const haystack = `${fold(title)} ${fold(slug)}`;
         if (!words.every((word) => haystack.includes(word))) continue;
-        const item = safeCatalogueItem(slug);
-        if (item) matched.push(item);
+        if (!SLUG_PATTERN.test(slug)) continue;
+        matched.push(slug);
       }
+      const requestedPage = Math.max(1, Number(page) || 1);
       const start = (requestedPage - 1) * PAGE_SIZE;
-      const items = matched.slice(start, start + PAGE_SIZE);
-      return { items, hasMore: start + PAGE_SIZE < matched.length };
+      const { window, hasMore } = { window: matched.slice(start, start + PAGE_SIZE), hasMore: start + PAGE_SIZE < matched.length };
+      return { items: await verifyWindow(window), hasMore };
     } catch (_) {
       return { items: [], hasMore: false };
     }

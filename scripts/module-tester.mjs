@@ -358,10 +358,16 @@ if (slug === "novelfire") {
           // is needed. Most-specific routes first.
           const sitemap = await fixture("sitemap.xml");
           const titleHTML = await fixture("details.html");
+          const titleAnime = (await fixture("details-anime.html")) || titleHTML;
+          const titleAdult = (await fixture("details-adult.html")) || titleHTML;
           const taille = await fixture("chapters.json");
           if (/\/api\/taille-proxy/i.test(u) && taille) return fixtureResponse(taille);
           if (/\/sitemap\.xml/i.test(u) && sitemap) return fixtureResponse(sitemap);
-          if (/\/catalogue\/[^/]+\/?$/i.test(u) && titleHTML) return fixtureResponse(titleHTML);
+          if (/\/catalogue\/[^/]+\/?$/i.test(u) && titleHTML) {
+            if (/\/catalogue\/fixture-boreal\/?$/i.test(u)) return fixtureResponse(titleAnime);
+            if (/\/catalogue\/fixture-interdit\/?$/i.test(u)) return fixtureResponse(titleAdult);
+            return fixtureResponse(titleHTML);
+          }
           if (home) return fixtureResponse(home);
         }
         if (slug === "mangaworld") {

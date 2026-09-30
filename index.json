@@ -120,7 +120,7 @@
       "id": "mugiwara-scan",
       "familyID": "mugiwara-scan",
       "name": "Mugiwara No Scans",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "language": "fr",
       "contentType": "pageImages",
       "contentRating": "suggestive",
@@ -128,7 +128,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/mugiwara-scan/manifest.json",
-        "sha256": "3dc36696fd1b92d3c3e82b0810e5926994407b717311ccf8a05c96608776f3ff"
+        "sha256": "710f56bca10a05cdb179d5aea9a53552033838b6bd94d5782e4db0725b923d37"
       },
       "icon": {
         "path": "modules/mugiwara-scan/icon.png",

@@ -79,15 +79,18 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
       assert.match(item.href, /^https:\/\/www\.mugiwara-no-streaming\.com\/catalogue\//);
     }
   }
-  // Duplicates and episode/scan subpages never reach the catalogue.
+  // Duplicates and episode/scan subpages never reach the catalogue, and
+  // anime-only plus adult titles are verified out of every list.
   assert.deepEqual(
     plain((await module.discoveryHome()).sections[0].items.map(({ id, title }) => ({ id, title }))),
     [
       { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore", title: "Fixture Aurore" },
-      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-boreal", title: "Fixture Boreal" },
-      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-interdit", title: "Fixture Interdit" },
     ],
   );
+  for (const item of (await module.discoveryHome()).sections[0].items) {
+    assert.match(item.image, /^https:\/\/static\.mugiwara-no-streaming\.com\//);
+    assert.equal(item.coverUrl, item.cover, "cover alias must match");
+  }
   assert.deepEqual(plain(await module.discoveryFeed("catalogue", 1)), {
     items: expected.discovery.sections[0].items,
     hasMore: false,
@@ -97,8 +100,6 @@ test("Mugiwara No Scans discovery, search, details, chapters and images match ex
     plain((await module.searchResults("FIXTURE", 1)).items.map(({ id }) => ({ id }))),
     [
       { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-aurore" },
-      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-boreal" },
-      { id: "https://www.mugiwara-no-streaming.com/catalogue/fixture-interdit" },
     ],
   );
   assert.deepEqual(plain(await module.extractDetails(expected.details.id)), expected.details);
