@@ -701,7 +701,12 @@
       stream += `${unescapeFlightPayload(match[1])}\n`;
     }
     const found = [];
-    const pattern = /\["\$","p",null,\{"children":("(?:[^"\\]|\\.)*"|\[(?:[^\[\]]|\[[^\[\]]*\])*\])\}/g;
+    // Live chapter pages key <p> payloads with React flight keys such as
+    // ".$root.props.children[5]..." and carry a NovelParagraph className
+    // after "children". The site-wide 404 template ("Cette page n'existe
+    // pas.") uses the legacy null key on every page, so both shapes must be
+    // accepted here; 404 lines are filtered as boilerplate in extractText.
+    const pattern = /\["\$","p",(?:null|"(?:[^"\\]|\\.)*"),\{"children":("(?:[^"\\]|\\.)*"|\[(?:[^\[\]]|\[[^\[\]]*\])*\])/g;
     let match;
     while ((match = pattern.exec(stream)) !== null) {
       const raw = match[1];
@@ -745,16 +750,42 @@
     return best;
   }
 
+  function hasNotFoundTemplate(html) {
+    // Every page embeds the Next.js 404 template (title "404 - Page
+    // introuvable", ara_ara.webp, "perdu dans une autre dimension"). Its
+    // presence alone means nothing; it only signals a soft-404 when no real
+    // chapter markup accompanies it.
+    return /(404\s*-\s*page introuvable|perdu dans une autre dimension|ara_ara\.webp)/i
+      .test(String(html || ""));
+  }
+
+  function hasChapterContent(html) {
+    return /(NovelParagraph|novel-paragraphs|chapter-heading-title|chapter-heading-volume)/i
+      .test(String(html || ""));
+  }
+
   async function extractText(reference) {
     const ref = normalizeChapterReference(reference);
     await extractDetails(ref.novelSlug);
     const html = await requestHTML(ref.href);
     if (!html.includes(ref.chapterSlug)) throw new Error("NovelDeLAube returned mismatched chapter content.");
+    // Soft-404 pages return HTTP 200 with the 404 template and no chapter
+    // markup. Never return "Tu t'es peut-être perdu dans une autre
+    // dimension..." as chapter text: fail closed so the reader shows an
+    // error instead of the website's 404 page.
+    if (hasNotFoundTemplate(html) && !hasChapterContent(html)) {
+      throw new Error("NovelDeLAube chapter was not found (website 404 page).");
+    }
     const paragraphs = longestRun(flightParagraphs(html), 2000);
     if (paragraphs.length < 3) throw new Error("NovelDeLAube chapter text is unavailable.");
-    const boilerplate = /^(cette page n'existe pas\.?|copyright ©|aurora fantrad|tous droits réservés)/i;
+    const boilerplate = /^(cette page n'existe pas\.?|tu t['’]es peut.+perdu dans une autre dimension|erreur 404\.?|retour (à|a) l'accueil\.?|copyright ©|aurora fantrad|tous droits réservés)/i;
     const content = paragraphs.filter((text) => !boilerplate.test(text)).join("\n\n").trim();
     if (!content) throw new Error("NovelDeLAube chapter text was empty.");
+    // A page that yielded only the embedded 404 template is a soft-404,
+    // even when the slug echoed in flight params passed the check above.
+    if (!hasChapterContent(html) && /perdu dans une autre dimension/i.test(content)) {
+      throw new Error("NovelDeLAube chapter was not found (website 404 page).");
+    }
     if (new TextEncoder().encode(content).byteLength > MAX_TEXT_BYTES) {
       throw new Error("NovelDeLAube chapter text exceeds the app size limit.");
     }

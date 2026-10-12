@@ -275,6 +275,41 @@ test("NovelDeLAube maps Saijo no Osewa to its Rich Girl Caretaker display title"
   );
 });
 
+test("NovelDeLAube extracts live NovelParagraph chapters and never returns the 404 template", async () => {
+  const live = await fixture("chapter-live.html");
+  const novel = await fixture("novel.html");
+  const module = await load(async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/notre_catalogue/Fixture_Dawn_A") return response(novel);
+    if (parsed.pathname.endsWith("/chapitre-live")) return response(live);
+    throw new Error(`Unexpected URL: ${url}`);
+  });
+
+  const text = await module.extractText(
+    "https://noveldelaube.com/notre_catalogue/Fixture_Dawn_A/tome_1/chapitre-live",
+  );
+  assert.ok(text.includes("-Il retient son souffle."), "live NovelParagraph text expected");
+  assert.ok(text.includes("Et ainsi commença l'histoire."), "all live paragraphs expected");
+  assert.ok(!text.includes("autre dimension"), "embedded 404 template must be filtered");
+  assert.ok(!text.includes("Cette page n'existe pas"), "embedded 404 line must be filtered");
+});
+
+test("NovelDeLAube fails closed on soft-404 chapter pages instead of returning 404 text", async () => {
+  const soft404 = await fixture("chapter-soft404.html");
+  const novel = await fixture("novel.html");
+  const module = await load(async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/notre_catalogue/Fixture_Dawn_A") return response(novel);
+    if (parsed.pathname.endsWith("/chapitre-fantome")) return response(soft404);
+    throw new Error(`Unexpected URL: ${url}`);
+  });
+
+  await assert.rejects(
+    () => module.extractText("https://noveldelaube.com/notre_catalogue/Fixture_Dawn_A/tome_1/chapitre-fantome"),
+    /not found|404|unavailable/i,
+  );
+});
+
 test("NovelDeLAube manifest pins the entry and a valid neutral PNG icon", async () => {
   const manifest = JSON.parse(await readFile(path.join(root, "manifest.json"), "utf8"));
   const entry = await readFile(path.join(root, "index.js"));
