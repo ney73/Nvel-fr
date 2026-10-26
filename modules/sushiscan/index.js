@@ -170,6 +170,28 @@
     return coverURL(value, base) || DEFAULT_POSTER_URL;
   }
 
+  // Reader/library screens in the app do not all read the same cover key.
+  // Official page-image modules expose "image"; some library surfaces probe
+  // "thumbnail"/"cover". Every alias carries the exact same absolute HTTPS
+  // URL so any of those lookups renders the real poster.
+  function posterFields(image) {
+    return {
+      image,
+      imageUrl: image,
+      imageURL: image,
+      thumbnail: image,
+      thumbnailUrl: image,
+      thumbnailURL: image,
+      cover: image,
+      coverUrl: image,
+      coverURL: image,
+      poster: image,
+      posterImage: image,
+      posterUrl: image,
+      posterURL: image,
+    };
+  }
+
   // RFC 6761 reserves ".invalid": such a name can never resolve, so an app
   // executor reporting it is saying "no destination was reached" rather than
   // reporting a redirect to a live unapproved host.
@@ -390,13 +412,7 @@
         href: ref.href,
         url: ref.href,
         title,
-        image,
-        thumbnail: image,
-        thumbnailUrl: image,
-        cover: image,
-        coverUrl: image,
-        poster: image,
-        posterImage: image,
+        ...posterFields(image),
         language: "fr",
       };
     } catch (_) {
@@ -634,13 +650,7 @@
       url: ref.href,
       title,
       description: pageDescription(html),
-      image,
-      thumbnail: image,
-      thumbnailUrl: image,
-      cover: image,
-      coverUrl: image,
-      poster: image,
-      posterImage: image,
+      ...posterFields(image),
       author,
       authors,
       genres,
@@ -764,13 +774,7 @@
       href: ref.href,
       url: ref.href,
       title: seriesTitle,
-      cover,
-      coverUrl: cover,
-      thumbnail: cover,
-      thumbnailUrl: cover,
-      image: cover,
-      poster: cover,
-      posterImage: cover,
+      ...posterFields(cover),
     };
     const collected = parseChapterEntries(html, ref.href, ref.id).map((entry) => ({
       id: chapterID(entry.href),
@@ -778,13 +782,7 @@
       url: entry.href,
       title: entry.title,
       number: chapterNumber(entry.title),
-      image: cover,
-      thumbnail: cover,
-      thumbnailUrl: cover,
-      cover,
-      coverUrl: cover,
-      poster: cover,
-      posterImage: cover,
+      ...posterFields(cover),
       manga,
     }));
     collected.sort((a, b) => {
