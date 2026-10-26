@@ -9,7 +9,7 @@ import vm from "node:vm";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => readFile(path.join(root, "fixtures", name), "utf8");
 const plain = (value) => JSON.parse(JSON.stringify(value));
-const posterKeys = ["image", "cover", "coverUrl", "poster", "posterImage"];
+const posterKeys = ["image", "thumbnail", "thumbnailUrl", "cover", "coverUrl", "poster", "posterImage"];
 
 function assertPoster(item, expected, label) {
   for (const key of posterKeys) {
@@ -161,6 +161,12 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
     url: expected.details.url,
     title: expected.details.title,
     cover: expected.details.cover,
+    coverUrl: expected.details.cover,
+    thumbnail: expected.details.cover,
+    thumbnailUrl: expected.details.cover,
+    image: expected.details.cover,
+    poster: expected.details.cover,
+    posterImage: expected.details.cover,
   });
   assert.deepEqual(
     plain(chapters.map(({ number }) => ({ number }))),

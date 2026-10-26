@@ -391,6 +391,8 @@
         url: ref.href,
         title,
         image,
+        thumbnail: image,
+        thumbnailUrl: image,
         cover: image,
         coverUrl: image,
         poster: image,
@@ -633,6 +635,8 @@
       title,
       description: pageDescription(html),
       image,
+      thumbnail: image,
+      thumbnailUrl: image,
       cover: image,
       coverUrl: image,
       poster: image,
@@ -755,7 +759,19 @@
     // it whatever property name they read.
     const cover = coverOrDefault(coverImage(html, ref.href), ref.href);
     const seriesTitle = pageTitle(html) || humanizeSlug(ref.id);
-    const manga = { id: ref.id, href: ref.href, url: ref.href, title: seriesTitle, cover };
+    const manga = {
+      id: ref.id,
+      href: ref.href,
+      url: ref.href,
+      title: seriesTitle,
+      cover,
+      coverUrl: cover,
+      thumbnail: cover,
+      thumbnailUrl: cover,
+      image: cover,
+      poster: cover,
+      posterImage: cover,
+    };
     const collected = parseChapterEntries(html, ref.href, ref.id).map((entry) => ({
       id: chapterID(entry.href),
       href: entry.href,
@@ -763,6 +779,8 @@
       title: entry.title,
       number: chapterNumber(entry.title),
       image: cover,
+      thumbnail: cover,
+      thumbnailUrl: cover,
       cover,
       coverUrl: cover,
       poster: cover,
