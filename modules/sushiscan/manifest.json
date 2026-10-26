@@ -1,7 +1,9 @@
 {
   "allowedHosts": [
     "sushiscan.net",
-    "*.sushiscan.net"
+    "*.sushiscan.net",
+    "sushiscan.fr",
+    "*.sushiscan.fr"
   ],
   "attribution": {
     "author": "Synthetiq-HQ",
@@ -20,7 +22,7 @@
   "contractVersion": 1,
   "entry": {
     "path": "modules/sushiscan/index.js",
-    "sha256": "02654facaf0245343983a2e18ee4d5808a0cbd1819e94a6b7c76000e930aa5b2"
+    "sha256": "cdeba5ef39530f94a487ea092be265f518cee7a6e67b0a0b7f19e2c926384028"
   },
   "familyID": "sushiscan-v1",
   "icon": {
@@ -42,5 +44,5 @@
   "releaseTrack": "beta",
   "status": "active",
   "universalLink": "https://sushiscan.net",
-  "version": "0.1.6"
+  "version": "0.1.7"
 }

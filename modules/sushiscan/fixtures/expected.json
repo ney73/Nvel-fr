@@ -241,19 +241,22 @@
     {
       "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-01.webp",
       "headers": {
-        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
       }
     },
     {
       "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-02.webp",
       "headers": {
-        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
       }
     },
     {
       "url": "https://c.sushiscan.net/wp-content/uploads97/FixtureAuroreChap3-03.webp",
       "headers": {
-        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/"
+        "Referer": "https://sushiscan.net/fixture-aurore-chapitre-3/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
       }
     }
   ]

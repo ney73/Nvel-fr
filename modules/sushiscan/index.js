@@ -11,6 +11,11 @@
   const MAX_RESPONSE_BYTES = 4 * 1024 * 1024;
   const MAX_DESCRIPTION_CHARS = 1500;
   const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+  // Reader images are hotlink-protected: the app downloads them from the
+  // image hosts with the chapter page as Referer. A desktop UA is attached to
+  // those image requests only; fetchv2 page requests stay UA-free.
+  const IMAGE_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+  const WORDPRESS_THUMBNAIL_SUFFIX = /-\d{1,5}x\d{1,5}(?=\.[a-z0-9]{2,5}$)/i;
   const DEFAULT_HEADERS = {
     Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
@@ -112,9 +117,14 @@
   function allowedHost(hostname) {
     // Smallest observed allowlist: catalogue, series and chapter pages live
     // on the apex host while covers and page images are served from the
-    // numbered image hosts observed in reader payloads (c, c1, ...).
+    // numbered image hosts observed in reader payloads (c, c1, ...). The
+    // alternate sushiscan.fr domain serves the same media and is accepted so
+    // those image URLs are never dropped.
     const host = String(hostname || "").toLowerCase();
-    return host === "sushiscan.net" || host.endsWith(".sushiscan.net");
+    return host === "sushiscan.net"
+      || host.endsWith(".sushiscan.net")
+      || host === "sushiscan.fr"
+      || host.endsWith(".sushiscan.fr");
   }
 
   function absoluteURL(value, base, stripSearch = false) {
@@ -132,6 +142,15 @@
     } catch (_) {
       return "";
     }
+  }
+
+  function coverURL(value, base) {
+    // WordPress serves generated thumbnails ("Cover-150x150.jpg"); request
+    // the original file instead so covers stay sharp. The cache-busting query
+    // is dropped at the same time.
+    const absolute = absoluteURL(value, base, true);
+    if (!absolute) return "";
+    return absolute.replace(WORDPRESS_THUMBNAIL_SUFFIX, "");
   }
 
   // RFC 6761 reserves ".invalid": such a name can never resolve, so an app
@@ -277,7 +296,7 @@
     for (const candidate of attributes) {
       // Inline base64 placeholders ("data:image/...") are never covers.
       if (/^\s*data:/i.test(candidate)) continue;
-      const absolute = absoluteURL(candidate, pageURL, true);
+      const absolute = coverURL(candidate, pageURL);
       if (!absolute) continue;
       if (/\/lazy_[^/]*$/i.test(absolute)) continue;
       if (!/\/(wp-content|uploads|media|cover|img)\//i.test(absolute)) continue;
@@ -492,7 +511,7 @@
 
   function coverImage(html, pageURL) {
     const text = String(html || "");
-    const fromMeta = absoluteURL(metaContent(text, "property", "og:image"), pageURL);
+    const fromMeta = coverURL(metaContent(text, "property", "og:image"), pageURL);
     if (fromMeta) return fromMeta;
     const featured = text.match(/<img[^>]*class="[^"]*wp-post-image[^"]*"[^>]*>/i)
       || text.match(/<img[^>]*\/wp-content\/uploads\/[^>]*>/i);
@@ -799,23 +818,75 @@
     }
   }
 
-  async function extractImages(id) {
-    const pageURL = chapterRefFromID(id);
-    const html = await requestHTML(pageURL);
-    const data = readerSources(html);
-    const sources = data && Array.isArray(data.sources) ? data.sources : [];
-    const withImages = sources.filter((source) => source && Array.isArray(source.images) && source.images.length > 0);
-    // Prefer the reader's default source, but never an empty one: fall back
-    // to the first source that actually carries images.
-    const wanted = withImages.find((source) => source.source === data.defaultSource) || withImages[0];
-    const candidates = wanted ? wanted.images : [];
-    // Only source-hosted page images are returned, in payload order. Foreign
-    // hosts and non-image targets are dropped; an empty payload fails
-    // instead of inventing pages.
+  // Inline placeholders and theme spinners are never pages: data URIs,
+  // SVG stubs, loading GIFs and lazy-loader images are all rejected.
+  const IMAGE_PLACEHOLDER = /(?:^|\/)(?:lazy[-_]?(?:load(?:er|ing)?|placeholder)?|loader|loading|spinner|blank|placeholder|pixel|transparent|1x1)[^/]*\.(?:gif|png|jpe?g|webp|avif|svg)(?:[?#]|$)/i;
+
+  function pageImageURL(value, pageURL) {
+    const candidate = decodeEntities(String(value || "")).trim();
+    if (!candidate) return "";
+    if (/^(?:data|blob|about):/i.test(candidate)) return "";
+    if (/base64/i.test(candidate)) return "";
+    if (/\.svg(?:[?#]|$)/i.test(candidate)) return "";
+    if (IMAGE_PLACEHOLDER.test(candidate)) return "";
+    return absoluteURL(candidate, pageURL);
+  }
+
+  function bestSrcsetURL(value) {
+    let best = "";
+    let bestScore = -1;
+    for (const part of String(value || "").split(",")) {
+      const fields = part.trim().split(/\s+/);
+      const url = fields[0];
+      if (!url) continue;
+      const width = /^(\d+)w$/i.exec(fields[1] || "");
+      const density = /^([\d.]+)x$/i.exec(fields[1] || "");
+      const score = width ? Number(width[1]) : density ? Number(density[1]) * 1000 : 0;
+      if (score > bestScore) {
+        best = url;
+        bestScore = score;
+      }
+    }
+    return best;
+  }
+
+  function imageFromTag(tag, pageURL) {
+    const text = String(tag || "");
+    // Lazy-loading attributes first, then srcset (highest candidate), then
+    // the plain src fallback.
+    const candidates = [];
+    for (const name of ["data-src", "data-lazy-src"]) {
+      const found = text.match(new RegExp(`\\s${name}=(["'])(.*?)\\1`, "i"));
+      if (found) candidates.push(found[2]);
+    }
+    const srcset = text.match(/\ssrcset=(["'])(.*?)\1/i);
+    if (srcset) candidates.push(bestSrcsetURL(srcset[2]));
+    const source = text.match(/\ssrc=(["'])(.*?)\1/i);
+    if (source) candidates.push(source[2]);
+    for (const candidate of candidates) {
+      const absolute = pageImageURL(candidate, pageURL);
+      if (absolute) return absolute;
+    }
+    return "";
+  }
+
+  function readerMarkup(html) {
+    const text = String(html || "");
+    const start = text.search(/<div\b[^>]*id=["']readerarea["']/i);
+    if (start < 0) return "";
+    let end = Math.min(text.length, start + 512 * 1024);
+    const script = text.indexOf("ts_reader.run(", start);
+    if (script > start) end = Math.min(end, script);
+    const article = text.indexOf("</article>", start);
+    if (article > start) end = Math.min(end, article);
+    return text.slice(start, end);
+  }
+
+  function normalizePageImages(candidates, pageURL) {
     const seen = new Set();
     const images = [];
     for (const candidate of candidates) {
-      const absolute = absoluteURL(String(candidate || ""), pageURL);
+      const absolute = pageImageURL(candidate, pageURL);
       if (!absolute || seen.has(absolute)) continue;
       let pathname = "";
       try {
@@ -825,10 +896,37 @@
       }
       if (!/\.(?:jpe?g|png|gif|webp|avif)(?:[?#]|$)/i.test(pathname)) continue;
       seen.add(absolute);
-      images.push({ url: absolute, headers: { Referer: pageURL } });
+      images.push(absolute);
     }
-    if (images.length === 0) throw new Error("Sushi Scan returned no page images.");
     return images;
+  }
+
+  function payloadImageCandidates(data) {
+    const sources = data && Array.isArray(data.sources) ? data.sources : [];
+    const withImages = sources.filter((source) => source && Array.isArray(source.images) && source.images.length > 0);
+    // Prefer the reader's default source, but never an empty one: fall back
+    // to the first source that actually carries images.
+    const wanted = withImages.find((source) => source.source === data.defaultSource) || withImages[0];
+    return wanted ? wanted.images : [];
+  }
+
+  async function extractImages(id) {
+    const pageURL = chapterRefFromID(id);
+    const html = await requestHTML(pageURL);
+    // Newer reader pages render lazy-loaded <img> tags directly in
+    // #readerarea; older ones keep the same images in the ts_reader JSON
+    // payload. Use whichever source yields the richer list.
+    const htmlCandidates = [];
+    for (const match of readerMarkup(html).matchAll(/<img\b[^>]*>/gi)) {
+      const image = imageFromTag(match[0], pageURL);
+      if (image) htmlCandidates.push(image);
+    }
+    const htmlImages = normalizePageImages(htmlCandidates, pageURL);
+    const payloadImages = normalizePageImages(payloadImageCandidates(readerSources(html)), pageURL);
+    const candidates = payloadImages.length > htmlImages.length ? payloadImages : htmlImages;
+    if (candidates.length === 0) throw new Error("Sushi Scan returned no page images.");
+    const headers = { Referer: pageURL, "User-Agent": IMAGE_USER_AGENT };
+    return candidates.map((url) => ({ url, headers: { ...headers } }));
   }
 
   const handlers = { searchResults, extractDetails, extractChapters, extractImages, discoveryHome, discoveryFeed };

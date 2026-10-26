@@ -101,7 +101,7 @@
       "id": "sushiscan-v1",
       "familyID": "sushiscan-v1",
       "name": "Sushi Scan",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "language": "fr",
       "contentType": "pageImages",
       "contentRating": "suggestive",
@@ -109,7 +109,7 @@
       "status": "active",
       "manifest": {
         "path": "modules/sushiscan/manifest.json",
-        "sha256": "1f34de8cd67eba9086bdb6b580dc67c3aff76a4155db99ba0ff301450f4d4e4a"
+        "sha256": "188ef1d9914cbac3a710a5dbe1250c96dfe002d33c8fa80dc694e6738a91070e"
       },
       "icon": {
         "path": "modules/sushiscan/icon.png",

@@ -35,7 +35,8 @@ function router(fixtures) {
     const parsed = new URL(url);
     assert.equal(parsed.protocol, "https:");
     assert.ok(
-      parsed.hostname === "sushiscan.net" || parsed.hostname.endsWith(".sushiscan.net"),
+      parsed.hostname === "sushiscan.net" || parsed.hostname.endsWith(".sushiscan.net")
+        || parsed.hostname === "sushiscan.fr" || parsed.hostname.endsWith(".sushiscan.fr"),
       `unapproved host ${parsed.hostname}`,
     );
     if (parsed.pathname === "/catalogue/fixture-aurore/") return response(fixtures.details);
@@ -43,6 +44,7 @@ function router(fixtures) {
     if (parsed.pathname === "/catalogue/1-fixture-preff/") return response(fixtures.detailsPrefixed);
     if (parsed.pathname === "/fixture-aurore-chapitre-3/") return response(fixtures.chapter);
     if (parsed.pathname === "/fixture-aurore-chapitre-2/") return response(fixtures.chapterFallback);
+    if (parsed.pathname === "/fixture-nebuleuse-chapitre-1/") return response(fixtures.chapterLazy);
     if (parsed.searchParams.has("s")) {
       if (/introuvable/i.test(parsed.searchParams.get("s") || "")) return response(fixtures.searchEmpty);
       if (/exclu/i.test(parsed.searchParams.get("s") || "")) return response(fixtures.searchExcluded);
@@ -63,6 +65,7 @@ async function loadFixtures() {
     detailsPrefixed: await fixture("details-prefixed.html"),
     chapter: await fixture("chapter.html"),
     chapterFallback: await fixture("chapter-fallback.html"),
+    chapterLazy: await fixture("chapter-lazy.html"),
   };
 }
 
@@ -156,6 +159,7 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   for (const image of images) {
     assert.match(image.url, /^https:\/\/c\.sushiscan\.net\//);
     assert.equal(image.headers.Referer, "https://sushiscan.net/fixture-aurore-chapitre-3/");
+    assert.match(image.headers["User-Agent"], /^Mozilla\/5\.0 /);
   }
   // An empty default source falls back to the first source carrying images.
   const fallback = await module.extractImages("fixture-aurore-chapitre-2");
@@ -166,6 +170,25 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
       { url: "https://c1.sushiscan.net/wp-content/uploads97/FixtureAuroreChap2-02.webp" },
     ],
   );
+  // Lazy-loaded reader tags win over placeholders: data-src, then
+  // data-lazy-src, then the best srcset candidate, then src. Base64/SVG/
+  // loading GIF stubs and foreign hosts are dropped, relative and
+  // protocol-relative URLs are resolved, and sushiscan.fr media is kept.
+  const lazy = await module.extractImages("fixture-nebuleuse-chapitre-1");
+  assert.deepEqual(
+    plain(lazy.map(({ url }) => ({ url }))),
+    [
+      { url: "https://c2.sushiscan.net/wp-content/uploads97/FixtureNebuleuseChap1-02.webp" },
+      { url: "https://sushiscan.net/wp-content/uploads97/FixtureNebuleuseChap1-01.webp" },
+      { url: "https://c2.sushiscan.net/wp-content/uploads97/FixtureNebuleuseChap1-03-hd.webp" },
+      { url: "https://sushiscan.net/wp-content/uploads97/FixtureNebuleuseChap1-04.webp" },
+      { url: "https://sushiscan.fr/wp-content/uploads97/FixtureNebuleuseChap1-05.webp" },
+    ],
+  );
+  for (const image of lazy) {
+    assert.equal(image.headers.Referer, "https://sushiscan.net/fixture-nebuleuse-chapitre-1/");
+    assert.match(image.headers["User-Agent"], /^Mozilla\/5\.0 /);
+  }
   // This pageImages module exposes no text terminal.
   assert.equal(typeof module.extractText, "undefined", "sushiscan must not expose text");
   assert.equal(typeof module.extractResources, "undefined", "sushiscan must not expose resources");
