@@ -149,18 +149,29 @@
 
   function coverURL(value, base) {
     // Normalize every cover through the URL parser so relative paths
-    // ("/wp-content/uploads/...") become absolute HTTPS URLs. WordPress
-    // generated thumbnails ("Cover-150x150.jpg") are reduced to their original
-    // file and dynamic/cache parameters are removed.
+    // ("/wp-content/uploads/...") become absolute HTTPS URLs. Optimizer
+    // parameters ("?w=300", "?resize=300,400", "?ssl=1", "?strip=all"...)
+    // and fragments are always removed before the URL is returned, so list
+    // views always receive the raw source asset. The host also enforces its
+    // own Referer policy at the image-loader level.
+    // WordPress generated thumbnails ("Cover-150x150.jpg") are reduced to
+    // their original file too.
     if (typeof value !== "string") return "";
     const input = decodeEntities(value).trim();
     if (!input || input.startsWith("#") || /^(?:data|blob|about):/i.test(input)) return "";
+    // Cut the query/fragment from the raw value first: this also covers
+    // malformed values where the query was glued after a thumbnail suffix.
+    const raw = input.split(/[?#]/)[0];
+    if (!raw) return "";
     try {
-      const url = new URL(input, base || BASE_URL);
+      const url = new URL(raw, base || BASE_URL);
       if (url.protocol !== "https:" || !allowedHost(url.hostname)) return "";
-      url.hash = "";
       url.search = "";
-      return url.href.replace(WORDPRESS_THUMBNAIL_SUFFIX, "");
+      url.hash = "";
+      url.pathname = url.pathname
+        .replace(/(\.(?:jpe?g|png|webp|avif|gif))(?:\/.*)?$/i, "$1")
+        .replace(WORDPRESS_THUMBNAIL_SUFFIX, "");
+      return url.href;
     } catch (_) {
       return "";
     }
@@ -173,8 +184,10 @@
   // Reader/library screens in the app do not all read the same cover key.
   // Official page-image modules expose "image"; some library surfaces probe
   // "thumbnail"/"cover". Every alias carries the exact same absolute HTTPS
-  // URL so any of those lookups renders the real poster.
-  function posterFields(image) {
+  // URL so any of those lookups renders the real poster. Re-sanitizing here
+  // guarantees no caller can leak a query string into a list view.
+  function posterFields(value) {
+    const image = coverOrDefault(value);
     return {
       image,
       imageUrl: image,

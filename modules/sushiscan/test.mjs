@@ -17,6 +17,8 @@ const posterKeys = [
 function assertPoster(item, expected, label) {
   for (const key of posterKeys) {
     assert.match(item[key], /^https:\/\//, `${label}: ${key} must be absolute HTTPS`);
+    assert.ok(!item[key].includes("?"), `${label}: ${key} must not carry optimizer query parameters`);
+    assert.ok(!item[key].includes("#"), `${label}: ${key} must not carry a fragment`);
     if (expected) assert.equal(item[key], expected, `${label}: ${key} must use the expected poster`);
   }
 }
