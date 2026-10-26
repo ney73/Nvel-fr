@@ -16,6 +16,9 @@
   // those image requests only; fetchv2 page requests stay UA-free.
   const IMAGE_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
   const WORDPRESS_THUMBNAIL_SUFFIX = /-\d{1,5}x\d{1,5}(?=\.[a-z0-9]{2,5}$)/i;
+  // Library and Continue Reading rows always need a renderable poster, even
+  // when a listing card has no usable image. This is the site's own logo file.
+  const DEFAULT_POSTER_URL = `${BASE_URL}/wp-content/uploads/sushiscanlogo.webp`;
   const DEFAULT_HEADERS = {
     Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
@@ -145,12 +148,26 @@
   }
 
   function coverURL(value, base) {
-    // WordPress serves generated thumbnails ("Cover-150x150.jpg"); request
-    // the original file instead so covers stay sharp. The cache-busting query
-    // is dropped at the same time.
-    const absolute = absoluteURL(value, base, true);
-    if (!absolute) return "";
-    return absolute.replace(WORDPRESS_THUMBNAIL_SUFFIX, "");
+    // Normalize every cover through the URL parser so relative paths
+    // ("/wp-content/uploads/...") become absolute HTTPS URLs. WordPress
+    // generated thumbnails ("Cover-150x150.jpg") are reduced to their original
+    // file and dynamic/cache parameters are removed.
+    if (typeof value !== "string") return "";
+    const input = decodeEntities(value).trim();
+    if (!input || input.startsWith("#") || /^(?:data|blob|about):/i.test(input)) return "";
+    try {
+      const url = new URL(input, base || BASE_URL);
+      if (url.protocol !== "https:" || !allowedHost(url.hostname)) return "";
+      url.hash = "";
+      url.search = "";
+      return url.href.replace(WORDPRESS_THUMBNAIL_SUFFIX, "");
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function coverOrDefault(value, base) {
+    return coverURL(value, base) || DEFAULT_POSTER_URL;
   }
 
   // RFC 6761 reserves ".invalid": such a name can never resolve, so an app
@@ -359,8 +376,12 @@
       if (!ref) return null;
       const title = resolveTitle(entry, ref.id);
       if (!title || hasUnsafeMarker(title)) return null;
-      const image = entry.image || "";
-      if (image && hasUnsafeMarker(image)) return null;
+      const rawImage = entry.image || "";
+      if (rawImage && hasUnsafeMarker(rawImage)) return null;
+      // Every item carries a renderable absolute poster. A failed thumbnail
+      // parse falls back to the site poster instead of an empty string, which
+      // is what makes Library/Continue Reading rows show blank placeholders.
+      const image = coverOrDefault(rawImage, BASE_URL);
       // "poster"/"posterImage" duplicate the cover under the other names
       // reader apps and library screens look up. Every URL here is absolute
       // HTTPS.
@@ -604,7 +625,7 @@
     if ([title, ...genres].some(hasUnsafeMarker)) {
       throw new Error("Sushi Scan details failed the safety filter.");
     }
-    const image = coverImage(html, ref.href);
+    const image = coverOrDefault(coverImage(html, ref.href), ref.href);
     const details = {
       id: ref.id,
       href: ref.href,
@@ -732,7 +753,7 @@
     // cover rides along on each chapter — flat fields plus a nested manga
     // object — so "Continue Reading" and library screens can always display
     // it whatever property name they read.
-    const cover = coverImage(html, ref.href);
+    const cover = coverOrDefault(coverImage(html, ref.href), ref.href);
     const seriesTitle = pageTitle(html) || humanizeSlug(ref.id);
     const manga = { id: ref.id, href: ref.href, url: ref.href, title: seriesTitle, cover };
     const collected = parseChapterEntries(html, ref.href, ref.id).map((entry) => ({
@@ -929,7 +950,15 @@
     return candidates.map((url) => ({ url, headers: { ...headers } }));
   }
 
-  const handlers = { searchResults, extractDetails, extractChapters, extractImages, discoveryHome, discoveryFeed };
+  const handlers = {
+    searchResults,
+    searchResultsPage: searchResults,
+    extractDetails,
+    extractChapters,
+    extractImages,
+    discoveryHome,
+    discoveryFeed,
+  };
   globalThis.SynthetiqModule = handlers;
   Object.assign(globalThis, handlers);
 })();

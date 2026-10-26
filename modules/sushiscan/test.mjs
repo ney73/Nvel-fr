@@ -9,6 +9,14 @@ import vm from "node:vm";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => readFile(path.join(root, "fixtures", name), "utf8");
 const plain = (value) => JSON.parse(JSON.stringify(value));
+const posterKeys = ["image", "cover", "coverUrl", "poster", "posterImage"];
+
+function assertPoster(item, expected, label) {
+  for (const key of posterKeys) {
+    assert.match(item[key], /^https:\/\//, `${label}: ${key} must be absolute HTTPS`);
+    if (expected) assert.equal(item[key], expected, `${label}: ${key} must use the expected poster`);
+  }
+}
 
 function response(body, status = 200) {
   return {
@@ -42,12 +50,14 @@ function router(fixtures) {
     if (parsed.pathname === "/catalogue/fixture-aurore/") return response(fixtures.details);
     if (parsed.pathname === "/catalogue/fixture-boreal/") return response(fixtures.details);
     if (parsed.pathname === "/catalogue/1-fixture-preff/") return response(fixtures.detailsPrefixed);
+    if (parsed.pathname === "/catalogue/fixture-sansvisuel/") return response(fixtures.detailsNoCover);
     if (parsed.pathname === "/fixture-aurore-chapitre-3/") return response(fixtures.chapter);
     if (parsed.pathname === "/fixture-aurore-chapitre-2/") return response(fixtures.chapterFallback);
     if (parsed.pathname === "/fixture-nebuleuse-chapitre-1/") return response(fixtures.chapterLazy);
     if (parsed.searchParams.has("s")) {
       if (/introuvable/i.test(parsed.searchParams.get("s") || "")) return response(fixtures.searchEmpty);
       if (/exclu/i.test(parsed.searchParams.get("s") || "")) return response(fixtures.searchExcluded);
+      if (/sansvisuel/i.test(parsed.searchParams.get("s") || "")) return response(fixtures.searchNoImage);
       return response(fixtures.search);
     }
     if (parsed.pathname === "/" || parsed.pathname === "/catalogue/") return response(fixtures.home);
@@ -61,8 +71,10 @@ async function loadFixtures() {
     search: await fixture("search.html"),
     searchEmpty: await fixture("search-empty.html"),
     searchExcluded: await fixture("search-excluded.html"),
+    searchNoImage: await fixture("search-noimage.html"),
     details: await fixture("details.html"),
     detailsPrefixed: await fixture("details-prefixed.html"),
+    detailsNoCover: await fixture("details-nocover.html"),
     chapter: await fixture("chapter.html"),
     chapterFallback: await fixture("chapter-fallback.html"),
     chapterLazy: await fixture("chapter-lazy.html"),
@@ -98,6 +110,16 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
   );
   assert.deepEqual(plain((await module.discoveryFeed("catalogue", 1)).items), expected.discovery.sections[0].items);
   assert.deepEqual(plain(await module.searchResults("fixture", 1)), expected.search);
+  for (const item of (await module.searchResults("FIXTURE", 1)).items) {
+    assertPoster(item, null, `search ${item.id}`);
+  }
+  // A card without any usable thumbnail still returns the default poster, and
+  // the searchResultsPage alias exposes the same normalized shape.
+  const noImageSearch = await module.searchResults("sansvisuel", 1);
+  assert.equal(noImageSearch.items.length, 1);
+  const defaultPoster = "https://sushiscan.net/wp-content/uploads/sushiscanlogo.webp";
+  assertPoster(noImageSearch.items[0], defaultPoster, "search without cover");
+  assert.deepEqual(plain(await module.searchResultsPage("sansvisuel", 1)), plain(noImageSearch));
   // Listing labels ("Manga …", "Artbook …", trailing chapter refs) are
   // stripped back to the bare series title.
   assert.deepEqual(
@@ -113,6 +135,15 @@ test("Sushi Scan discovery, search, details, chapters and images match expected.
     plain(await module.extractDetails("https://sushiscan.net/catalogue/fixture-aurore/")),
     expected.details,
   );
+  // Details and chapter rows never expose an empty poster: when the series
+  // page has neither og:image nor a featured image, the default poster is
+  // used by every cover alias and by the nested manga object.
+  const noCoverDetails = await module.extractDetails("fixture-sansvisuel");
+  assertPoster(noCoverDetails, defaultPoster, "details without cover");
+  const noCoverChapters = await module.extractChapters("fixture-sansvisuel");
+  assert.equal(noCoverChapters.length, 1);
+  assertPoster(noCoverChapters[0], defaultPoster, "chapter without series cover");
+  assert.equal(noCoverChapters[0].manga.cover, defaultPoster);
   // The complete chapter list is never capped, stays oldest-first, spans
   // every container shape, drops foreign-series links plus the unsafe
   // entry, and carries the series cover for library screens.
